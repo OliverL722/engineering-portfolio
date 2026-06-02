@@ -1,12 +1,4 @@
 ---
-import Welcome from '../components/Welcome.astro';
-import Layout from '../layouts/Layout.astro';
-
-// Welcome to Astro! Wondering what to do next? Check out the Astro documentation at https://docs.astro.build
-// Don't want to use any of this? Delete everything in this file, the `assets`, `components`, and `layouts` directories, and start fresh.
----
-
----
 ---
 
 <html lang="en">
@@ -18,180 +10,31 @@ import Layout from '../layouts/Layout.astro';
 
   <body>
     <main>
-      <section class="hero">
-        <p class="eyebrow">UIUC Mechanical Engineering</p>
-        <h1>Oliver Lesiakowski</h1>
-        <p class="subtitle">
-          Engineering student focused on product design, prototyping,
-          electromechanical systems, and hands-on technical problem solving.
-        </p>
-
-        <div class="buttons">
-          <a href="#projects">View Projects</a>
-          <a href="/resume.pdf">Resume</a>
-          <a href="https://www.linkedin.com/in/olesiakowski/" target="_blank">LinkedIn</a>
-        </div>
-      </section>
-
-      <section id="projects" class="projects">
-        <h2>Featured Projects</h2>
-
-        <div class="project-grid">
-          <article class="card">
-            <p class="tag">Product Design</p>
-            <h3>DeckStep™ Skateboard Shoe Rack</h3>
-            <p>
-              Repurposed a discarded skateboard deck into a compact shoe rack
-              using CAD, 3D-printed PETG legs, customer requirements, and
-              design-for-assembly principles.
-            </p>
-          </article>
-
-          <article class="card">
-            <p class="tag">Robotics</p>
-            <h3>1-lb Antweight Combat Robot</h3>
-            <p>
-              Designed and built a small combat robot involving CAD, 3D printing,
-              drivetrain layout, wiring, soldering, and competition testing.
-            </p>
-          </article>
-
-          <article class="card">
-            <p class="tag">CAD / Mechanisms</p>
-            <h3>Folding Numpad</h3>
-            <p>
-              Developed a portable folding numpad concept with a hinge-based
-              mechanical layout, CAD assembly, exploded view, and design
-              documentation.
-            </p>
-          </article>
-        </div>
-      </section>
-    </main>
+		<img src="/dog.JPEG" alt="Oliver Lesiakowski engineering portfolio" />    </main>
   </body>
 </html>
 
 <style>
-  :root {
-    font-family:
-      Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
-      "Segoe UI", sans-serif;
-    background: #0b0f17;
-    color: #f4f7fb;
-  }
-
   * {
     box-sizing: border-box;
   }
 
   body {
     margin: 0;
-    background:
-      radial-gradient(circle at top left, rgba(60, 120, 255, 0.18), transparent 35%),
-      #0b0f17;
+    background: #0b0f17;
   }
 
   main {
-    width: min(1100px, 92%);
-    margin: 0 auto;
-  }
-
-  .hero {
-    min-height: 75vh;
+    min-height: 100vh;
     display: flex;
-    flex-direction: column;
     justify-content: center;
+    align-items: flex-start;
   }
 
-  .eyebrow {
-    color: #8ab4ff;
-    font-weight: 700;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    font-size: 0.85rem;
-  }
-
-  h1 {
-    font-size: clamp(3rem, 8vw, 6.5rem);
-    line-height: 0.95;
-    margin: 0;
-  }
-
-  .subtitle {
-    max-width: 720px;
-    font-size: 1.25rem;
-    line-height: 1.6;
-    color: #b9c3d4;
-    margin-top: 1.5rem;
-  }
-
-  .buttons {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 1rem;
-    margin-top: 2rem;
-  }
-
-  .buttons a {
-    color: #f4f7fb;
-    text-decoration: none;
-    border: 1px solid #2d3748;
-    padding: 0.9rem 1.2rem;
-    border-radius: 999px;
-    background: rgba(255, 255, 255, 0.04);
-  }
-
-  .buttons a:hover {
-    border-color: #8ab4ff;
-  }
-
-  .projects {
-    padding: 4rem 0 6rem;
-  }
-
-  h2 {
-    font-size: 2.2rem;
-    margin-bottom: 1.5rem;
-  }
-
-  .project-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 1rem;
-  }
-
-  .card {
-    border: 1px solid #1f2937;
-    border-radius: 1.25rem;
-    padding: 1.4rem;
-    background: rgba(255, 255, 255, 0.04);
-  }
-
-  .tag {
-    color: #8ab4ff;
-    font-size: 0.85rem;
-    font-weight: 700;
-    margin: 0 0 1rem;
-  }
-
-  h3 {
-    font-size: 1.35rem;
-    margin: 0 0 1rem;
-  }
-
-  .card p {
-    color: #b9c3d4;
-    line-height: 1.6;
-  }
-
-  @media (max-width: 800px) {
-    .project-grid {
-      grid-template-columns: 1fr;
-    }
-
-    .hero {
-      min-height: 65vh;
-      padding-top: 3rem;
-    }
+  img {
+    width: 100%;
+    max-width: 1400px;
+    height: auto;
+    display: block;
   }
 </style>
