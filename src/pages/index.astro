@@ -6,7 +6,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width" />
     <title>Oliver Lesiakowski | Engineering Portfolio</title>
-    <link rel="icon" type="image/png" href="/favicon.png" />
+    <link rel="icon" type="image/png" href="/oli_logo.png" />
   </head>
 
   <body>
@@ -393,7 +393,8 @@
     --nav-bg: rgba(0, 0, 0, 0.9);
     --text: #ccd6f6;
     --muted: #8892b0;
-    --accent: #64ffda;
+    --accent: #29b6ff;
+    --accent-rgb: 41, 182, 255;
     --white: #e6f1ff;
   }
 
@@ -451,8 +452,8 @@
     padding: 1rem;
     background: var(--nav-bg);
     backdrop-filter: blur(12px);
-    border-top: 1px solid rgba(100, 255, 218, 0.08);
-    border-bottom: 1px solid rgba(100, 255, 218, 0.12);
+    border-top: 1px solid rgba(var(--accent-rgb), 0.08);
+    border-bottom: 1px solid rgba(var(--accent-rgb), 0.12);
   }
 
   .tab-button,
@@ -478,7 +479,7 @@
   .tab-button.active {
     color: var(--accent);
     border-color: var(--accent);
-    background: rgba(100, 255, 218, 0.1);
+    background: rgba(var(--accent-rgb), 0.1);
   }
 
   .tab-button:hover,
@@ -544,7 +545,7 @@
   .education-card {
     min-height: 230px;
     padding: 1.5rem;
-    border: 1px solid rgba(100, 255, 218, 0.12);
+    border: 1px solid rgba(var(--accent-rgb), 0.12);
     background: var(--bg-light);
     border-radius: 10px;
     transition:
@@ -555,7 +556,7 @@
   .project-card:hover,
   .education-card:hover {
     transform: translateY(-4px);
-    border-color: rgba(100, 255, 218, 0.45);
+    border-color: rgba(var(--accent-rgb), 0.45);
   }
 
   .main-education {
@@ -606,8 +607,8 @@
   }
 
   .trait-list span {
-    border: 1px solid rgba(100, 255, 218, 0.25);
-    background: rgba(100, 255, 218, 0.06);
+    border: 1px solid rgba(var(--accent-rgb), 0.25);
+    background: rgba(var(--accent-rgb), 0.06);
     color: var(--accent);
     padding: 0.5rem 0.7rem;
     border-radius: 999px;
@@ -630,14 +631,14 @@
     height: calc(100% - 1rem);
     background: linear-gradient(
       to bottom,
-      rgba(100, 255, 218, 0.85),
-      rgba(100, 255, 218, 0.12)
+      rgba(var(--accent-rgb), 0.85),
+      rgba(var(--accent-rgb), 0.12)
     );
   }
 
   .timeline-item {
     position: relative;
-    margin-bottom: 8rem;
+    margin-bottom: 5.5rem;
     opacity: 0;
     transform: translateY(24px);
     transition:
@@ -663,8 +664,8 @@
     border-radius: 50%;
     background: var(--accent);
     box-shadow:
-      0 0 0 6px rgba(100, 255, 218, 0.08),
-      0 0 26px rgba(100, 255, 218, 0.55);
+      0 0 0 6px rgba(var(--accent-rgb), 0.08),
+      0 0 26px rgba(var(--accent-rgb), 0.55);
   }
 
   .timeline-card {
@@ -672,9 +673,9 @@
     grid-template-columns: 170px 1fr;
     gap: 1.5rem;
     padding: 1.5rem;
-    border: 1px solid rgba(100, 255, 218, 0.12);
+    border: 1px solid rgba(var(--accent-rgb), 0.12);
     background:
-      linear-gradient(135deg, rgba(100, 255, 218, 0.04), transparent 35%),
+      linear-gradient(135deg, rgba(var(--accent-rgb), 0.04), transparent 35%),
       var(--bg-light);
     border-radius: 12px;
     transition:
@@ -684,7 +685,7 @@
 
   .timeline-card:hover {
     transform: translateY(-4px);
-    border-color: rgba(100, 255, 218, 0.45);
+    border-color: rgba(var(--accent-rgb), 0.45);
   }
 
   .timeline-media {
@@ -769,7 +770,7 @@
     }
 
     .timeline-item {
-      margin-bottom: 6rem;
+      margin-bottom: 4.5rem;
     }
 
     .timeline-item:last-child {
