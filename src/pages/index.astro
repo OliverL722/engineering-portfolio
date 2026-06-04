@@ -38,18 +38,18 @@
           <article class="education-card main-education">
             <p class="project-number">UIUC</p>
             <h3>University of Illinois Urbana-Champaign</h3>
-            <p class="project-type">Mechanical Engineering · Expected May 2028</p>
+            <p class="project-type">B.S. Mechanical Engineering · Minor in Computer Science · Expected May 2028</p>
             <p>
-              Sophomore studying mechanical engineering with interests in product
-              design, prototyping, manufacturing, robotics, and electromechanical systems.
+              Mechanical engineering student focused on product design, prototyping,
+              manufacturing, robotics, electromechanical systems, and hands-on technical work.
             </p>
           </article>
 
           <article class="education-card">
             <p class="project-number">GPA</p>
-            <h3>3.81 / 4.00</h3>
-            <p class="project-type">Academic performance</p>
-            <p>Current GPA. Update before using professionally if needed.</p>
+            <h3>3.84 / 4.00</h3>
+            <p class="project-type">Dean’s List</p>
+            <p>Current academic standing listed on resume.</p>
           </article>
 
           <article class="education-card">
@@ -81,71 +81,169 @@
       </section>
 
       <section id="projects" class="screen">
-        <p class="section-label">02. Projects</p>
-        <h2>Selected work.</h2>
+        <div id="projectsOverview" class="projects-overview">
+          <p class="section-label">02. Projects</p>
+          <h2>Project categories.</h2>
 
-        <div class="project-grid">
-          <article class="project-card">
-            <p class="project-number">01</p>
-            <h3>DeckStep™ Shoe Rack</h3>
-            <p class="project-type">Repurposed skateboard deck with 3D-printed PETG supports.</p>
+          <div class="project-grid">
+            <article class="project-card project-category-card" data-project="completed" tabindex="0">
+              <p class="project-number">01</p>
+              <h3 class="card-title">Completed Projects</h3>
+              <p class="project-type">
+                Finished builds with a clear final result, physical prototype, or tested outcome.
+              </p>
 
-            <div class="trait-list">
-              <span>Fusion 360</span>
-              <span>3D Printing</span>
-              <span>PETG</span>
-              <span>Product Design</span>
-              <span>DFA</span>
-              <span>GD&T</span>
-              <span>Prototyping</span>
+              <div class="trait-list">
+                <span>DeckStep™</span>
+                <span>Combat Robot</span>
+                <span>Electric Guitar</span>
+                <span>Ride-On Mods</span>
+              </div>
+
+              <button class="open-project-button" type="button">Open section</button>
+            </article>
+
+            <article class="project-card project-category-card" data-project="models" tabindex="0">
+              <p class="project-number">02</p>
+              <h3 class="card-title">3D Models</h3>
+              <p class="project-type">
+                CAD models, assemblies, mechanisms, design studies, and class-based modeling work.
+              </p>
+
+              <div class="trait-list">
+                <span>Fusion 360</span>
+                <span>Creo</span>
+                <span>Assemblies</span>
+                <span>GD&T</span>
+              </div>
+
+              <button class="open-project-button" type="button">Open section</button>
+            </article>
+
+            <article class="project-card project-category-card" data-project="current" tabindex="0">
+              <p class="project-number">03</p>
+              <h3 class="card-title">Current Projects</h3>
+              <p class="project-type">
+                Active work, ongoing prototypes, research-related builds, and projects still being improved.
+              </p>
+
+              <div class="trait-list">
+                <span>Portfolio Site</span>
+                <span>Research Fixtures</span>
+                <span>ASME PDT</span>
+                <span>Iteration</span>
+              </div>
+
+              <button class="open-project-button" type="button">Open section</button>
+            </article>
+
+            <article class="project-card project-category-card" data-project="software" tabindex="0">
+              <p class="project-number">04</p>
+              <h3 class="card-title">Software Projects</h3>
+              <p class="project-type">
+                Programming work, web development, school coding projects, tools, and technical scripts.
+              </p>
+
+              <div class="trait-list">
+                <span>C++</span>
+                <span>Python</span>
+                <span>Java</span>
+                <span>Astro</span>
+              </div>
+
+              <button class="open-project-button" type="button">Open section</button>
+            </article>
+          </div>
+        </div>
+
+        <div id="projectCategoryPage" class="detail-page category-page" hidden>
+          <button id="categoryBackButton" class="back-button" type="button">
+            ← Back to project categories
+          </button>
+
+          <div class="category-page-header">
+            <p id="categoryKicker" class="section-label">Project Category</p>
+            <h2 id="categoryTitle" class="animated-title-target">Category Title</h2>
+            <p id="categoryTime" class="detail-time">Time / status</p>
+            <p id="categoryDescription" class="detail-description">
+              Short description placeholder.
+            </p>
+
+            <div id="categoryTags" class="trait-list centered-tags"></div>
+          </div>
+
+          <div id="categoryProjectRows" class="project-row-list"></div>
+        </div>
+
+        <div id="individualProjectPage" class="detail-page individual-page" hidden>
+          <button id="individualBackButton" class="back-button" type="button">
+            ← Back to section
+          </button>
+
+          <div class="individual-page-header">
+            <p id="individualKicker" class="section-label">Project</p>
+            <h2 id="individualTitle" class="animated-title-target">Project Title</h2>
+            <p id="individualTime" class="detail-time">Time / status</p>
+            <p id="individualDescription" class="detail-description">
+              Short project description placeholder.
+            </p>
+
+            <div id="individualTags" class="trait-list centered-tags"></div>
+          </div>
+
+          <div class="project-work-hero">
+            <section class="detail-panel project-summary-card">
+              <div class="detail-panel-header">
+                <p class="project-number">Highlights</p>
+                <h3>Project summary</h3>
+              </div>
+
+              <ul id="individualBullets" class="detail-bullet-list"></ul>
+            </section>
+
+            <div class="detail-media large-media">
+              <span id="individualMainImage">Main image placeholder</span>
             </div>
-          </article>
+          </div>
 
-          <article class="project-card">
-            <p class="project-number">02</p>
-            <h3>Antweight Combat Robot</h3>
-            <p class="project-type">Small combat robot involving CAD, wiring, soldering, and testing.</p>
+          <div class="detail-layout">
+            <section class="detail-panel">
+              <div class="detail-panel-header">
+                <p class="project-number">Gallery</p>
+                <h3>Image placeholders</h3>
+              </div>
 
-            <div class="trait-list">
-              <span>Robotics</span>
-              <span>CAD</span>
-              <span>3D Printing</span>
-              <span>Soldering</span>
-              <span>Electronics</span>
-              <span>Drivetrain</span>
-              <span>Testing</span>
-            </div>
-          </article>
+              <div class="placeholder-grid">
+                <div class="mini-photo-placeholder">
+                  <span>Image 01</span>
+                </div>
+                <div class="mini-photo-placeholder">
+                  <span>Image 02</span>
+                </div>
+                <div class="mini-photo-placeholder">
+                  <span>Image 03</span>
+                </div>
+                <div class="mini-photo-placeholder">
+                  <span>Image 04</span>
+                </div>
+              </div>
+            </section>
 
-          <article class="project-card">
-            <p class="project-number">03</p>
-            <h3>Folding Numpad</h3>
-            <p class="project-type">Portable hinge-based numpad concept with CAD assembly and BOM.</p>
+            <section class="detail-panel">
+              <div class="detail-panel-header">
+                <p class="project-number">Notes</p>
+                <h3>What to add later</h3>
+              </div>
 
-            <div class="trait-list">
-              <span>Fusion 360</span>
-              <span>CAD Assembly</span>
-              <span>Mechanisms</span>
-              <span>BOM</span>
-              <span>Design Docs</span>
-              <span>Product Design</span>
-            </div>
-          </article>
+              <ul class="detail-bullet-list">
+                <li>Add final photos, CAD screenshots, or code screenshots.</li>
+                <li>Add a short explanation of the problem and design constraints.</li>
+                <li>Add a result, takeaway, or what changed between revisions.</li>
+              </ul>
+            </section>
+          </div>
 
-          <article class="project-card">
-            <p class="project-number">04</p>
-            <h3>Electric Ride-On Mods</h3>
-            <p class="project-type">Modified electric ride-on system with upgraded power electronics.</p>
-
-            <div class="trait-list">
-              <span>Batteries</span>
-              <span>Motors</span>
-              <span>Wiring</span>
-              <span>BLDC Controller</span>
-              <span>Electronics</span>
-              <span>Troubleshooting</span>
-            </div>
-          </article>
+          <div id="individualSections" class="detail-section-stack"></div>
         </div>
       </section>
 
@@ -163,21 +261,21 @@
               </div>
 
               <div class="timeline-content">
-                <p class="timeline-date">Summer 2026</p>
+                <p class="timeline-date">May 2026 – Present</p>
                 <h3>Motorola Solutions</h3>
                 <p class="timeline-role">Battery Cell Engineering Intern</p>
 
                 <ul>
-                  <li class="typewrite">Supporting battery cell testing, validation, and safety-related engineering work.</li>
-                  <li class="typewrite">Working in a lab environment with mechanical, electrical, and test equipment.</li>
-                  <li class="typewrite">Applying hands-on engineering skills to real product reliability and safety problems.</li>
+                  <li class="typewrite">Supporting lithium-ion cell safety testing using thermal, vibration, shock, microscopy, and electrical test equipment.</li>
+                  <li class="typewrite">Evaluating cell performance, charging behavior, and safety response for battery characterization and compliance testing.</li>
+                  <li class="typewrite">Working under senior electrical and mechanical engineers on product reliability and safety problems.</li>
                 </ul>
 
                 <div class="trait-list">
                   <span>Battery Systems</span>
-                  <span>Testing</span>
-                  <span>Validation</span>
-                  <span>Lab Work</span>
+                  <span>Cell Testing</span>
+                  <span>Thermal Chambers</span>
+                  <span>Vibration Testing</span>
                   <span>Safety</span>
                 </div>
               </div>
@@ -193,21 +291,21 @@
               </div>
 
               <div class="timeline-content">
-                <p class="timeline-date">2026</p>
+                <p class="timeline-date">January 2026 – May 2026</p>
                 <h3>University of Illinois Urbana-Champaign</h3>
-                <p class="timeline-role">Undergraduate Mechanical Engineering Research Assistant</p>
+                <p class="timeline-role">Mechanical Engineering Research Assistant · Combustion Diagnostics Lab</p>
 
                 <ul>
-                  <li class="typewrite">Supporting experimental setup and technical lab development.</li>
-                  <li class="typewrite">Working with mechanical fabrication, wiring, and instrumentation tasks.</li>
-                  <li class="typewrite">Building practical research experience in an engineering lab environment.</li>
+                  <li class="typewrite">Designed and fabricated utility fixtures for off-campus combustion research using Fusion 360, 3D printing, and aluminum assemblies.</li>
+                  <li class="typewrite">Created mounting components for HVAC, electrical, and laboratory instruments.</li>
+                  <li class="typewrite">Gathered researcher requirements and developed budget-conscious fixture designs to improve lab usability and setup efficiency.</li>
                 </ul>
 
                 <div class="trait-list">
                   <span>Research</span>
+                  <span>Fusion 360</span>
                   <span>Fabrication</span>
-                  <span>Instrumentation</span>
-                  <span>Wiring</span>
+                  <span>3D Printing</span>
                   <span>Lab Setup</span>
                 </div>
               </div>
@@ -223,22 +321,22 @@
               </div>
 
               <div class="timeline-content">
-                <p class="timeline-date">October 2025 – December 2025</p>
-                <h3>TipTek</h3>
-                <p class="timeline-role">Production Technician</p>
+                <p class="timeline-date">October 2025 – January 2026</p>
+                <h3>Tiptek, LLC</h3>
+                <p class="timeline-role">Laboratory Technician</p>
 
                 <ul>
-                  <li class="typewrite">Produced and inspected tungsten nanoprobes for chip-related applications.</li>
-                  <li class="typewrite">Used microscope-based validation to check probe sharpness and quality.</li>
-                  <li class="typewrite">Worked in a precision production environment requiring consistency and accuracy.</li>
+                  <li class="typewrite">Manufactured and aligned 90+ tungsten nanoprobes per shift using precision tools for semiconductor failure analysis.</li>
+                  <li class="typewrite">Performed optical and digital inspection to verify nanoprobe geometry and tip radius at sub-10 nanometer scale.</li>
+                  <li class="typewrite">Worked in a precision lab environment requiring consistency, accuracy, and careful microscope-based inspection.</li>
                 </ul>
 
                 <div class="trait-list">
                   <span>Microscope Work</span>
-                  <span>Production</span>
-                  <span>Quality Control</span>
+                  <span>Nanoprobes</span>
+                  <span>Inspection</span>
                   <span>Precision</span>
-                  <span>Materials</span>
+                  <span>Semiconductors</span>
                 </div>
               </div>
             </div>
@@ -249,26 +347,27 @@
 
             <div class="timeline-card">
               <div class="timeline-media">
-                <img src="/images/experience/Truevalue_Logo.jpg" alt="True Value logo" />
+                <img src="/images/experience/Truevalue_Logo.jpg" alt="True Value and Do it Best Hardware logo" />
               </div>
 
               <div class="timeline-content">
-                <p class="timeline-date">July 2023 – August 2024</p>
-                <h3>True Value Hardware</h3>
-                <p class="timeline-role">Hardware Sales and Service Associate</p>
+                <p class="timeline-date">July 2023 – August 2025</p>
+                <h3>True Value / Do it Best Hardware</h3>
+                <p class="timeline-role">Senior Sales and Technical Associate</p>
 
                 <ul>
-                  <li class="typewrite">Assisted customers with hardware, tools, parts, paint, keys, and repair services.</li>
-                  <li class="typewrite">Completed hands-on service work including screen repair, pipe cutting, and key duplication.</li>
-                  <li class="typewrite">Built practical familiarity with hardware, fasteners, materials, and customer problem solving.</li>
+                  <li class="typewrite">Promoted after acquisition to lead technical service operations, employee mentorship, and shift coordination.</li>
+                  <li class="typewrite">Trained and mentored 8+ employees in safety procedures, customer service, and technical services.</li>
+                  <li class="typewrite">Provided hardware solutions for 50–70 customers per shift while managing inventory and special orders across 2000+ SKUs.</li>
+                  <li class="typewrite">Handled key duplication, paint matching, screen repairs, and cutting/rethreading pipe.</li>
                 </ul>
 
                 <div class="trait-list">
                   <span>Hardware</span>
-                  <span>Tools</span>
+                  <span>Technical Service</span>
+                  <span>Shift Lead</span>
+                  <span>Training</span>
                   <span>Customer Service</span>
-                  <span>Repair</span>
-                  <span>Materials</span>
                 </div>
               </div>
             </div>
@@ -278,10 +377,506 @@
     </main>
 
     <script>
+      // @ts-nocheck
+
       const tabButtons = document.querySelectorAll(".tab-button");
       const screens = document.querySelectorAll(".screen");
       const revealItems = document.querySelectorAll(".reveal");
       const typewriteElements = document.querySelectorAll(".typewrite");
+
+      const projectCards = document.querySelectorAll(".project-category-card");
+      const projectsOverview = document.querySelector("#projectsOverview");
+      const projectCategoryPage = document.querySelector("#projectCategoryPage");
+      const individualProjectPage = document.querySelector("#individualProjectPage");
+
+      const categoryBackButton = document.querySelector("#categoryBackButton");
+      const individualBackButton = document.querySelector("#individualBackButton");
+
+      const categoryKicker = document.querySelector("#categoryKicker");
+      const categoryTitle = document.querySelector("#categoryTitle");
+      const categoryTime = document.querySelector("#categoryTime");
+      const categoryDescription = document.querySelector("#categoryDescription");
+      const categoryTags = document.querySelector("#categoryTags");
+      const categoryProjectRows = document.querySelector("#categoryProjectRows");
+
+      const individualKicker = document.querySelector("#individualKicker");
+      const individualTitle = document.querySelector("#individualTitle");
+      const individualTime = document.querySelector("#individualTime");
+      const individualDescription = document.querySelector("#individualDescription");
+      const individualTags = document.querySelector("#individualTags");
+      const individualBullets = document.querySelector("#individualBullets");
+      const individualMainImage = document.querySelector("#individualMainImage");
+      const individualSections = document.querySelector("#individualSections");
+
+      let activeCategoryId = null;
+      let activeCategoryCard = null;
+      let activeProjectRow = null;
+
+      const projectData = {
+        completed: {
+          kicker: "01. Completed Projects",
+          title: "Completed Projects",
+          time: "Finished builds / tested prototypes",
+          description:
+            "Finished engineering projects with a physical result, final prototype, or tested outcome.",
+          tags: ["Prototyping", "Testing", "3D Printing", "Mechanical Design"],
+          projects: [
+            {
+              title: "DeckStep™ Shoe Rack",
+              time: "Fall 2025",
+              image: "Finished product image placeholder",
+              description:
+                "Repurposed skateboard deck converted into a shoe rack using custom 3D-printed supports.",
+              tags: ["Fusion 360", "PETG", "3D Printing", "DFA", "Prototyping"],
+              bullets: [
+                "Designed 3D-printed supports around skateboard truck mounting geometry.",
+                "Iterated the support geometry for better stability, fit, and print reliability.",
+                "Built a final physical prototype intended for compact dorm/apartment use."
+              ],
+              sections: [
+                {
+                  label: "Build",
+                  title: "Prototype photos",
+                  image: "Assembly image placeholder",
+                  bullets: [
+                    "Add final front/isometric photo.",
+                    "Add close-up of support pieces.",
+                    "Add photo showing shoes loaded on the rack."
+                  ]
+                },
+                {
+                  label: "Design",
+                  title: "CAD and manufacturing notes",
+                  image: "CAD screenshot placeholder",
+                  bullets: [
+                    "Add CAD screenshot of the leg geometry.",
+                    "Mention print material, print time, and major revision changes.",
+                    "Add a short note about fitment and hole spacing."
+                  ]
+                }
+              ]
+            },
+            {
+              title: "3D Printed Electric Guitar",
+              time: "Summer 2025",
+              image: "Finished guitar image placeholder",
+              description:
+                "FDM-printed electric guitar body with integrated cavities and a resin-finished exterior.",
+              tags: ["Fusion 360", "FDM Printing", "Resin Finish", "CAD", "Fabrication"],
+              bullets: [
+                "Modeled the guitar body with cavities for pickups, wiring, and controls.",
+                "Iterated geometry and print orientation for rigidity and component fit.",
+                "Used resin finishing to improve durability and appearance."
+              ],
+              sections: [
+                {
+                  label: "Model",
+                  title: "Body design",
+                  image: "CAD body placeholder",
+                  bullets: [
+                    "Add body model screenshot.",
+                    "Show cavities for pickups and controls.",
+                    "Show section view or underside if available."
+                  ]
+                },
+                {
+                  label: "Fabrication",
+                  title: "Print and finish",
+                  image: "Print process placeholder",
+                  bullets: [
+                    "Add print-in-progress photo.",
+                    "Add resin finish photo.",
+                    "Add final assembled guitar photo."
+                  ]
+                }
+              ]
+            },
+            {
+              title: "Electric Ride-On Mods",
+              time: "2020 – 2022",
+              image: "Ride-on vehicle image placeholder",
+              description:
+                "Performance upgrades for electric ride-on toys involving motors, batteries, wiring, and controllers.",
+              tags: ["Motors", "Batteries", "Wiring", "BLDC Controller", "Troubleshooting"],
+              bullets: [
+                "Installed brushless motor upgrades on ride-on vehicles and scooters.",
+                "Wired lithium polymer battery packs with safety mechanisms.",
+                "Tested performance improvements and identified electrical/mechanical issues."
+              ],
+              sections: [
+                {
+                  label: "Powertrain",
+                  title: "Electrical upgrades",
+                  image: "Battery wiring placeholder",
+                  bullets: [
+                    "Add battery layout photo.",
+                    "Add controller/wiring photo.",
+                    "List voltage, range, or performance changes."
+                  ]
+                },
+                {
+                  label: "Testing",
+                  title: "Performance results",
+                  image: "Test photo placeholder",
+                  bullets: [
+                    "Add final vehicle photo.",
+                    "Add short testing notes.",
+                    "Mention what failed or had to be redesigned."
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+
+        models: {
+          kicker: "02. 3D Models",
+          title: "3D Models",
+          time: "CAD / assemblies / design studies",
+          description:
+            "CAD-first projects including assemblies, fixtures, mechanisms, renderings, and engineering drawings.",
+          tags: ["Fusion 360", "Creo", "Assemblies", "GD&T", "Drawings"],
+          projects: [
+            {
+              title: "Folding Numpad",
+              time: "Spring 2025",
+              image: "Numpad render placeholder",
+              description:
+                "Portable hinge-based numpad concept with CAD assembly, BOM, and design documentation.",
+              tags: ["Fusion 360", "Assembly", "Mechanisms", "BOM", "Product Design"],
+              bullets: [
+                "Designed a folding mechanical layout for a portable numpad.",
+                "Created CAD assembly structure and supporting design documentation.",
+                "Explored hinge design, portability, and user-focused constraints."
+              ],
+              sections: [
+                {
+                  label: "Assembly",
+                  title: "Exploded view",
+                  image: "Exploded view placeholder",
+                  bullets: [
+                    "Add full assembly screenshot.",
+                    "Add exploded view screenshot.",
+                    "Add hinge/detail screenshot."
+                  ]
+                },
+                {
+                  label: "Documentation",
+                  title: "BOM and design notes",
+                  image: "Drawing sheet placeholder",
+                  bullets: [
+                    "Add BOM screenshot if useful.",
+                    "Mention constraints from the project.",
+                    "Add short notes on design tradeoffs."
+                  ]
+                }
+              ]
+            },
+            {
+              title: "Research Fixture Models",
+              time: "Spring 2026",
+              image: "Fixture CAD placeholder",
+              description:
+                "Utility fixtures modeled for combustion research setup and lab instrument mounting.",
+              tags: ["Fusion 360", "Fixtures", "3D Printing", "Aluminum", "Lab Setup"],
+              bullets: [
+                "Created fixture models for HVAC, electrical, and lab instrument support.",
+                "Balanced researcher needs, budget, manufacturability, and lab usability.",
+                "Used CAD and fabricated components to support off-campus research work."
+              ],
+              sections: [
+                {
+                  label: "Fixture",
+                  title: "Mounting design",
+                  image: "Mounting CAD placeholder",
+                  bullets: [
+                    "Add CAD screenshot of fixture.",
+                    "Add finished fabricated part photo.",
+                    "Add install/setup photo if available."
+                  ]
+                },
+                {
+                  label: "Use Case",
+                  title: "Lab integration",
+                  image: "Lab setup placeholder",
+                  bullets: [
+                    "Explain what the fixture supported.",
+                    "Mention constraints from the researcher.",
+                    "Describe how it improved setup efficiency."
+                  ]
+                }
+              ]
+            },
+            {
+              title: "Creo Design Studies",
+              time: "Coursework",
+              image: "Creo screenshot placeholder",
+              description:
+                "Course-based design optimization and modeling work using Creo and mechanical design constraints.",
+              tags: ["Creo", "Optimization", "CAD", "Constraints", "Analysis"],
+              bullets: [
+                "Modeled mechanical parts under specified design constraints.",
+                "Used CAD tools to evaluate geometry and performance-related tradeoffs.",
+                "Created visual design outputs for class-based engineering work."
+              ],
+              sections: [
+                {
+                  label: "Optimization",
+                  title: "Design constraints",
+                  image: "Constraint view placeholder",
+                  bullets: [
+                    "Add Creo screenshot.",
+                    "Add notes on the loading or geometry constraints.",
+                    "Add before/after design comparison."
+                  ]
+                },
+                {
+                  label: "Result",
+                  title: "Final model",
+                  image: "Final model placeholder",
+                  bullets: [
+                    "Add final model render.",
+                    "Add any analysis screenshot.",
+                    "Add short takeaway."
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+
+        current: {
+          kicker: "03. Current Projects",
+          title: "Current Projects",
+          time: "In progress",
+          description:
+            "Ongoing work, active prototypes, portfolio improvements, and research-related engineering builds.",
+          tags: ["Iteration", "Research", "Lab Setup", "Portfolio", "Prototyping"],
+          projects: [
+            {
+              title: "Portfolio Website",
+              time: "Current",
+              image: "Website screenshot placeholder",
+              description:
+                "Personal engineering portfolio built with Astro, custom CSS, GitHub Pages, and a custom domain.",
+              tags: ["Astro", "HTML/CSS/JS", "GitHub", "UI Design", "Deployment"],
+              bullets: [
+                "Built a custom dark-themed portfolio site from scratch.",
+                "Configured GitHub Pages deployment and custom domain routing.",
+                "Added animated sections, project pages, and responsive layouts."
+              ],
+              sections: [
+                {
+                  label: "Frontend",
+                  title: "Site interface",
+                  image: "Interface screenshot placeholder",
+                  bullets: [
+                    "Add screenshot of homepage.",
+                    "Add screenshot of project interaction.",
+                    "Add short note on design inspiration."
+                  ]
+                },
+                {
+                  label: "Deployment",
+                  title: "GitHub Pages workflow",
+                  image: "Deployment screenshot placeholder",
+                  bullets: [
+                    "Mention Astro build setup.",
+                    "Mention custom domain.",
+                    "Mention version control with Git."
+                  ]
+                }
+              ]
+            },
+            {
+              title: "ASME Product Development",
+              time: "Current / Recent",
+              image: "ASME project placeholder",
+              description:
+                "Team-based product development work focused on evaluating design, manufacturing, and material options.",
+              tags: ["Product Design", "Teamwork", "Manufacturing", "Budgeting", "Iteration"],
+              bullets: [
+                "Collaborated on design and prototyping tasks for a robotic 3D print arm concept.",
+                "Evaluated manufacturing and material choices around performance goals.",
+                "Worked within budget constraints and team-based design reviews."
+              ],
+              sections: [
+                {
+                  label: "Concept",
+                  title: "Design direction",
+                  image: "Concept sketch placeholder",
+                  bullets: [
+                    "Add team concept image.",
+                    "Add CAD screenshot if available.",
+                    "Add short description of your contribution."
+                  ]
+                },
+                {
+                  label: "Constraints",
+                  title: "Budget and manufacturing",
+                  image: "Manufacturing placeholder",
+                  bullets: [
+                    "List major constraints.",
+                    "Mention budget target.",
+                    "Mention materials considered."
+                  ]
+                }
+              ]
+            },
+            {
+              title: "Research Lab Fixtures",
+              time: "Current / Recent",
+              image: "Fixture progress placeholder",
+              description:
+                "Research support work involving fixture design, fabrication, mounting components, and lab setup improvements.",
+              tags: ["Research", "Fabrication", "Fusion 360", "3D Printing", "Lab Setup"],
+              bullets: [
+                "Designed fixtures around researcher needs and lab equipment requirements.",
+                "Built components using CAD, 3D printing, and aluminum assemblies.",
+                "Improved usability and setup efficiency for research instrumentation."
+              ],
+              sections: [
+                {
+                  label: "Design",
+                  title: "Fixture development",
+                  image: "Fixture design placeholder",
+                  bullets: [
+                    "Add CAD screenshots.",
+                    "Add part photos.",
+                    "Add installed fixture photo."
+                  ]
+                },
+                {
+                  label: "Impact",
+                  title: "Lab usability",
+                  image: "Lab use placeholder",
+                  bullets: [
+                    "Explain the problem.",
+                    "Show the installed solution.",
+                    "Explain what became easier or cleaner."
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+
+        software: {
+          kicker: "04. Software Projects",
+          title: "Software Projects",
+          time: "Code / tools / web",
+          description:
+            "Programming projects, web development, class coding work, scripts, and software tools.",
+          tags: ["C++", "Python", "Java", "HTML/CSS/JS", "GitHub"],
+          projects: [
+            {
+              title: "Portfolio Website",
+              time: "2026",
+              image: "Website project placeholder",
+              description:
+                "Custom portfolio website built to showcase engineering projects, experience, and resume-ready work.",
+              tags: ["Astro", "JavaScript", "CSS", "GitHub Pages", "Web Design"],
+              bullets: [
+                "Built the site structure using Astro and custom JavaScript.",
+                "Designed interactive category pages and animated detail views.",
+                "Configured GitHub deployment and custom domain setup."
+              ],
+              sections: [
+                {
+                  label: "Interaction",
+                  title: "Animated project pages",
+                  image: "Animation screenshot placeholder",
+                  bullets: [
+                    "Show project card expansion.",
+                    "Show category page.",
+                    "Show individual project page."
+                  ]
+                },
+                {
+                  label: "Stack",
+                  title: "Tools used",
+                  image: "Code screenshot placeholder",
+                  bullets: [
+                    "Astro framework.",
+                    "HTML/CSS/JavaScript.",
+                    "GitHub Pages deployment."
+                  ]
+                }
+              ]
+            },
+            {
+              title: "C++ Coursework Projects",
+              time: "2026",
+              image: "C++ code placeholder",
+              description:
+                "Programming assignments and practice projects involving C++ templates, iterators, data structures, and file parsing.",
+              tags: ["C++", "Templates", "Iterators", "Data Structures", "Debugging"],
+              bullets: [
+                "Implemented iterator-based functions and data structure operations.",
+                "Worked with templates, linked structures, and file input/output.",
+                "Used VS Code, command-line builds, and debugging workflows."
+              ],
+              sections: [
+                {
+                  label: "Code",
+                  title: "Implementation examples",
+                  image: "Code block placeholder",
+                  bullets: [
+                    "Add screenshot of a clean solution.",
+                    "Add short explanation of what the function does.",
+                    "Link GitHub repo if you make one public."
+                  ]
+                },
+                {
+                  label: "Testing",
+                  title: "Build and debug",
+                  image: "Terminal screenshot placeholder",
+                  bullets: [
+                    "Add terminal output.",
+                    "Add notes on test cases.",
+                    "Add what you learned from debugging."
+                  ]
+                }
+              ]
+            },
+            {
+              title: "Bogemon Game",
+              time: "2024",
+              image: "Game screenshot placeholder",
+              description:
+                "Unity 2D game project involving scenes, animations, transitions, and C# scripting.",
+              tags: ["Unity", "C#", "Animation", "Game Logic", "UI"],
+              bullets: [
+                "Built gameplay scenes and animated transitions.",
+                "Used C# scripts to control game behavior and interface elements.",
+                "Created an intro sequence and battle-style scene flow."
+              ],
+              sections: [
+                {
+                  label: "Gameplay",
+                  title: "Scenes and transitions",
+                  image: "Scene screenshot placeholder",
+                  bullets: [
+                    "Add game screenshot.",
+                    "Add intro scene screenshot.",
+                    "Add battle scene screenshot."
+                  ]
+                },
+                {
+                  label: "Code",
+                  title: "Scripts and logic",
+                  image: "C# script placeholder",
+                  bullets: [
+                    "Show one script screenshot.",
+                    "Explain what it controls.",
+                    "Mention Unity tools used."
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      };
 
       typewriteElements.forEach((element) => {
         element.dataset.fullText = element.textContent.trim();
@@ -335,7 +930,381 @@
         });
       }
 
+      function getTitleSnapshot(element) {
+        if (!element) return null;
+
+        const rect = element.getBoundingClientRect();
+        const styles = window.getComputedStyle(element);
+
+        return {
+          text: element.textContent.trim(),
+          left: rect.left,
+          top: rect.top,
+          width: rect.width,
+          fontSizeNumber: parseFloat(styles.fontSize) || 16,
+          fontWeight: styles.fontWeight,
+          letterSpacing: styles.letterSpacing,
+          lineHeight: styles.lineHeight
+        };
+      }
+
+      function animateTitleSnapshot(snapshot, toElement, callback, duration = 280) {
+        if (!snapshot || !toElement) {
+          if (callback) callback();
+          return;
+        }
+
+        const toRect = toElement.getBoundingClientRect();
+        const toStyles = window.getComputedStyle(toElement);
+        const targetFontSize = parseFloat(toStyles.fontSize) || snapshot.fontSizeNumber;
+        const startScale = snapshot.fontSizeNumber / targetFontSize;
+
+        const startX = snapshot.left;
+        const startY = snapshot.top;
+        const endX = toRect.left;
+        const endY = toRect.top;
+
+        const clone = document.createElement("div");
+        clone.className = "title-flight";
+        clone.textContent = snapshot.text;
+
+        clone.style.setProperty("--flight-duration", `${duration}ms`);
+        clone.style.left = `${startX}px`;
+        clone.style.top = `${startY}px`;
+        clone.style.width = `${Math.max(toRect.width, snapshot.width / startScale)}px`;
+        clone.style.fontSize = toStyles.fontSize;
+        clone.style.fontWeight = toStyles.fontWeight;
+        clone.style.letterSpacing = toStyles.letterSpacing;
+        clone.style.lineHeight = toStyles.lineHeight;
+        clone.style.transform = `translate3d(0, 0, 0) scale(${startScale})`;
+
+        document.body.appendChild(clone);
+        toElement.classList.add("title-hidden");
+
+        requestAnimationFrame(() => {
+          clone.style.transform = `translate3d(${endX - startX}px, ${endY - startY}px, 0) scale(1)`;
+        });
+
+        setTimeout(() => {
+          toElement.classList.remove("title-hidden");
+          clone.classList.add("title-flight-fade");
+
+          setTimeout(() => {
+            clone.remove();
+
+            if (callback) callback();
+          }, 70);
+        }, duration);
+      }
+
+      function fillTags(container, tags) {
+        container.innerHTML = "";
+
+        tags.forEach((tag) => {
+          const tagElement = document.createElement("span");
+          tagElement.textContent = tag;
+          container.appendChild(tagElement);
+        });
+      }
+
+      function fillBullets(container, bullets) {
+        container.innerHTML = "";
+
+        bullets.forEach((bullet) => {
+          const item = document.createElement("li");
+          item.textContent = bullet;
+          container.appendChild(item);
+        });
+      }
+
+      function createBulletList(items) {
+        const list = document.createElement("ul");
+        list.className = "detail-bullet-list";
+
+        items.forEach((item) => {
+          const listItem = document.createElement("li");
+          listItem.textContent = item;
+          list.appendChild(listItem);
+        });
+
+        return list;
+      }
+
+      function populateCategory(category) {
+        categoryKicker.textContent = category.kicker;
+        categoryTitle.textContent = category.title;
+        categoryTime.textContent = category.time;
+        categoryDescription.textContent = category.description;
+
+        fillTags(categoryTags, category.tags);
+
+        categoryProjectRows.innerHTML = "";
+
+        category.projects.forEach((project, index) => {
+          const row = document.createElement("button");
+          row.className = "project-row";
+          row.type = "button";
+          row.dataset.projectIndex = index;
+
+          const tagHTML = project.tags
+            .slice(0, 4)
+            .map((tag) => `<span>${tag}</span>`)
+            .join("");
+
+          row.innerHTML = `
+            <div class="project-row-main">
+              <p class="project-number">${String(index + 1).padStart(2, "0")}</p>
+
+              <div class="project-row-text">
+                <h3>${project.title}</h3>
+                <p>${project.time}</p>
+              </div>
+            </div>
+
+            <div class="project-row-tags">
+              ${tagHTML}
+            </div>
+
+            <span class="project-row-action">View more →</span>
+          `;
+
+          row.addEventListener("click", () => {
+            openIndividualProject(index, row);
+          });
+
+          categoryProjectRows.appendChild(row);
+        });
+      }
+
+      function populateIndividual(project, category) {
+        individualKicker.textContent = category.title;
+        individualTitle.textContent = project.title;
+        individualTime.textContent = project.time;
+        individualDescription.textContent = project.description;
+        individualMainImage.textContent = project.image;
+
+        fillTags(individualTags, project.tags);
+        fillBullets(individualBullets, project.bullets);
+
+        individualSections.innerHTML = "";
+
+        project.sections.forEach((section) => {
+          const sectionCard = document.createElement("section");
+          sectionCard.className = "detail-wide-section";
+
+          const content = document.createElement("div");
+          content.className = "detail-wide-content";
+
+          const label = document.createElement("p");
+          label.className = "project-number";
+          label.textContent = section.label;
+
+          const title = document.createElement("h3");
+          title.textContent = section.title;
+
+          content.appendChild(label);
+          content.appendChild(title);
+          content.appendChild(createBulletList(section.bullets));
+
+          const media = document.createElement("div");
+          media.className = "detail-media section-media";
+
+          const mediaText = document.createElement("span");
+          mediaText.textContent = section.image;
+          media.appendChild(mediaText);
+
+          sectionCard.appendChild(content);
+          sectionCard.appendChild(media);
+
+          individualSections.appendChild(sectionCard);
+        });
+      }
+
+      function openCategory(categoryId, card) {
+        const category = projectData[categoryId];
+        if (!category) return;
+
+        activeCategoryId = categoryId;
+        activeCategoryCard = card;
+
+        populateCategory(category);
+
+        const sourceTitle = card.querySelector(".card-title");
+        const titleSnapshot = getTitleSnapshot(sourceTitle);
+
+        card.classList.add("launching");
+        projectsOverview.classList.add("overview-exiting");
+
+        setTimeout(() => {
+          projectsOverview.hidden = true;
+          projectCategoryPage.hidden = false;
+          projectCategoryPage.classList.remove("closing");
+
+          requestAnimationFrame(() => {
+            projectCategoryPage.classList.add("active");
+
+            setTimeout(() => {
+              animateTitleSnapshot(titleSnapshot, categoryTitle, () => {
+                card.classList.remove("launching");
+              }, 280);
+            }, 30);
+          });
+
+          projectCategoryPage.scrollIntoView({
+            behavior: "smooth",
+            block: "start"
+          });
+        }, 130);
+      }
+
+      function closeCategory(animate = true) {
+        if (projectCategoryPage.hidden) return;
+
+        if (!animate) {
+          projectCategoryPage.hidden = true;
+          projectCategoryPage.classList.remove("active", "closing");
+          projectsOverview.hidden = false;
+          projectsOverview.classList.remove("overview-exiting");
+          return;
+        }
+
+        const titleSnapshot = getTitleSnapshot(categoryTitle);
+        const targetTitle = activeCategoryCard?.querySelector(".card-title");
+
+        projectsOverview.hidden = false;
+        projectsOverview.classList.remove("overview-exiting");
+
+        projectCategoryPage.classList.remove("active");
+        projectCategoryPage.classList.add("closing");
+
+        projectsOverview.scrollIntoView({
+          behavior: "auto",
+          block: "start"
+        });
+
+        requestAnimationFrame(() => {
+          animateTitleSnapshot(titleSnapshot, targetTitle, null, 220);
+        });
+
+        setTimeout(() => {
+          projectCategoryPage.hidden = true;
+          projectCategoryPage.classList.remove("closing");
+        }, 210);
+      }
+
+      function openIndividualProject(projectIndex, sourceRow) {
+        const category = projectData[activeCategoryId];
+        const project = category?.projects[projectIndex];
+
+        if (!project || !category) return;
+
+        activeProjectRow = sourceRow;
+
+        populateIndividual(project, category);
+
+        const sourceTitle = sourceRow.querySelector("h3");
+        const titleSnapshot = getTitleSnapshot(sourceTitle);
+
+        sourceRow.classList.add("launching");
+        projectCategoryPage.classList.remove("active");
+        projectCategoryPage.classList.add("overview-exiting");
+
+        setTimeout(() => {
+          projectCategoryPage.hidden = true;
+          individualProjectPage.hidden = false;
+          individualProjectPage.classList.remove("closing");
+
+          requestAnimationFrame(() => {
+            individualProjectPage.classList.add("active");
+
+            setTimeout(() => {
+              animateTitleSnapshot(titleSnapshot, individualTitle, () => {
+                sourceRow.classList.remove("launching");
+              }, 280);
+            }, 30);
+          });
+
+          individualProjectPage.scrollIntoView({
+            behavior: "smooth",
+            block: "start"
+          });
+        }, 130);
+      }
+
+      function closeIndividualProject(animate = true) {
+        if (individualProjectPage.hidden) return;
+
+        if (!animate) {
+          individualProjectPage.hidden = true;
+          individualProjectPage.classList.remove("active", "closing");
+          projectCategoryPage.hidden = false;
+          projectCategoryPage.classList.add("active");
+          projectCategoryPage.classList.remove("overview-exiting");
+          return;
+        }
+
+        const titleSnapshot = getTitleSnapshot(individualTitle);
+        const targetTitle = activeProjectRow?.querySelector("h3");
+
+        projectCategoryPage.hidden = false;
+        projectCategoryPage.classList.remove("overview-exiting", "closing", "behind-detail");
+        projectCategoryPage.classList.add("active");
+
+        individualProjectPage.classList.remove("active");
+        individualProjectPage.classList.add("closing");
+
+        projectCategoryPage.scrollIntoView({
+          behavior: "auto",
+          block: "start"
+        });
+
+        requestAnimationFrame(() => {
+          animateTitleSnapshot(titleSnapshot, targetTitle, null, 220);
+        });
+
+        setTimeout(() => {
+          individualProjectPage.hidden = true;
+          individualProjectPage.classList.remove("closing");
+        }, 210);
+      }
+
+      function resetProjectPages() {
+        individualProjectPage.hidden = true;
+        individualProjectPage.classList.remove("active", "closing");
+
+        projectCategoryPage.hidden = true;
+        projectCategoryPage.classList.remove("active", "closing", "overview-exiting", "behind-detail");
+
+        projectsOverview.hidden = false;
+        projectsOverview.classList.remove("overview-exiting");
+      }
+
+      projectCards.forEach((card) => {
+        card.addEventListener("click", () => {
+          openCategory(card.dataset.project, card);
+        });
+
+        card.addEventListener("keydown", (event) => {
+          if (event.key === "Enter" || event.key === " ") {
+            event.preventDefault();
+            openCategory(card.dataset.project, card);
+          }
+        });
+      });
+
+      categoryBackButton.addEventListener("click", () => {
+        closeCategory(true);
+      });
+
+      individualBackButton.addEventListener("click", () => {
+        closeIndividualProject(true);
+      });
+
       function showTab(tabName) {
+        if (tabName !== "projects") {
+          resetProjectPages();
+        }
+
         tabButtons.forEach((button) => {
           button.classList.toggle("active", button.dataset.tab === tabName);
         });
@@ -400,6 +1369,10 @@
 
   * {
     box-sizing: border-box;
+  }
+
+  [hidden] {
+    display: none !important;
   }
 
   html {
@@ -468,10 +1441,10 @@
     font-size: 0.92rem;
     cursor: pointer;
     transition:
-      color 0.2s ease,
-      border-color 0.2s ease,
-      background 0.2s ease,
-      transform 0.2s ease;
+      color 0.16s ease,
+      border-color 0.16s ease,
+      background 0.16s ease,
+      transform 0.16s ease;
   }
 
   .tab-button:hover,
@@ -500,13 +1473,13 @@
 
   .screen.active {
     display: block;
-    animation: fadeIn 0.22s ease-in-out;
+    animation: fadeIn 0.18s ease-in-out;
   }
 
   @keyframes fadeIn {
     from {
       opacity: 0;
-      transform: translateY(8px);
+      transform: translateY(6px);
     }
 
     to {
@@ -519,7 +1492,8 @@
   .project-type,
   .project-number,
   .timeline-date,
-  .timeline-role {
+  .timeline-role,
+  .detail-time {
     font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
   }
 
@@ -549,14 +1523,356 @@
     background: var(--bg-light);
     border-radius: 10px;
     transition:
-      transform 0.2s ease,
-      border-color 0.2s ease;
+      transform 0.16s ease,
+      border-color 0.16s ease,
+      box-shadow 0.16s ease;
   }
 
   .project-card:hover,
   .education-card:hover {
     transform: translateY(-4px);
     border-color: rgba(var(--accent-rgb), 0.45);
+  }
+
+  .project-category-card {
+    position: relative;
+    cursor: pointer;
+    overflow: hidden;
+  }
+
+  .project-category-card.launching {
+    transform: scale(1.025);
+    border-color: rgba(var(--accent-rgb), 0.75);
+    box-shadow: 0 0 38px rgba(var(--accent-rgb), 0.18);
+  }
+
+  .open-project-button {
+    margin-top: 1.6rem;
+    color: var(--accent);
+    border: 1px solid rgba(var(--accent-rgb), 0.35);
+    background: rgba(var(--accent-rgb), 0.06);
+    padding: 0.65rem 0.9rem;
+    border-radius: 999px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+    cursor: pointer;
+  }
+
+  .projects-overview {
+    opacity: 1;
+    transform: scale(1);
+    transition:
+      opacity 0.16s ease,
+      transform 0.16s ease;
+  }
+
+  .projects-overview.overview-exiting {
+    opacity: 0;
+    transform: scale(0.975);
+    pointer-events: none;
+  }
+
+  .detail-page {
+    opacity: 0;
+    transform: scale(0.975) translateY(12px);
+    transform-origin: center top;
+    transition:
+      opacity 0.18s ease,
+      transform 0.18s ease;
+    will-change: opacity, transform;
+  }
+
+  .detail-page.active {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+
+  .detail-page.closing,
+  .detail-page.overview-exiting {
+    opacity: 0;
+    transform: scale(0.975) translateY(12px);
+    pointer-events: none;
+  }
+
+  .category-page-header,
+  .individual-page-header {
+    max-width: 920px;
+    margin: 0 auto 3rem;
+    text-align: center;
+  }
+
+  .category-page-header h2,
+  .individual-page-header h2 {
+    font-size: clamp(2.8rem, 7vw, 6rem);
+    line-height: 0.95;
+    margin-bottom: 1rem;
+    white-space: nowrap;
+  }
+
+  .centered-tags {
+    justify-content: center;
+  }
+
+  .project-row-list {
+    display: grid;
+    gap: 1rem;
+  }
+
+  .project-row {
+    width: 100%;
+    border: 1px solid rgba(var(--accent-rgb), 0.12);
+    background:
+      linear-gradient(135deg, rgba(var(--accent-rgb), 0.035), transparent 35%),
+      var(--bg-light);
+    color: var(--text);
+    border-radius: 14px;
+    padding: 1.3rem 1.4rem;
+    display: grid;
+    grid-template-columns: 1.2fr 1fr auto;
+    align-items: center;
+    gap: 1.2rem;
+    cursor: pointer;
+    text-align: left;
+    opacity: 0;
+    transform: translateY(10px);
+    animation: rowIn 0.28s ease forwards;
+    transition:
+      transform 0.16s ease,
+      border-color 0.16s ease,
+      background 0.16s ease,
+      box-shadow 0.16s ease;
+  }
+
+  .project-row:nth-child(1) {
+    animation-delay: 0.04s;
+  }
+
+  .project-row:nth-child(2) {
+    animation-delay: 0.08s;
+  }
+
+  .project-row:nth-child(3) {
+    animation-delay: 0.12s;
+  }
+
+  .project-row:nth-child(4) {
+    animation-delay: 0.16s;
+  }
+
+  @keyframes rowIn {
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .project-row:hover,
+  .project-row.launching {
+    transform: translateY(-4px);
+    border-color: rgba(var(--accent-rgb), 0.55);
+    background:
+      linear-gradient(135deg, rgba(var(--accent-rgb), 0.07), transparent 38%),
+      var(--bg-light);
+    box-shadow: 0 0 32px rgba(var(--accent-rgb), 0.1);
+  }
+
+  .project-row-main {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 1rem;
+    align-items: center;
+  }
+
+  .project-row-main .project-number {
+    margin: 0;
+    min-width: 2.5rem;
+  }
+
+  .project-row-text h3 {
+    margin: 0 0 0.35rem;
+  }
+
+  .project-row-text p {
+    margin: 0;
+    color: var(--muted);
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+    font-size: 0.88rem;
+  }
+
+  .project-row-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.45rem;
+  }
+
+  .project-row-tags span {
+    border: 1px solid rgba(var(--accent-rgb), 0.22);
+    background: rgba(var(--accent-rgb), 0.05);
+    color: var(--accent);
+    padding: 0.42rem 0.58rem;
+    border-radius: 999px;
+    font-size: 0.75rem;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+  }
+
+  .project-row-action {
+    color: var(--accent);
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+    white-space: nowrap;
+  }
+
+  .title-flight {
+    position: fixed;
+    z-index: 20000;
+    color: var(--white);
+    margin: 0;
+    pointer-events: none;
+    white-space: nowrap;
+    transform-origin: left top;
+    will-change: transform, opacity;
+    backface-visibility: hidden;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: geometricPrecision;
+    transition:
+      transform var(--flight-duration, 280ms) cubic-bezier(0.22, 0.9, 0.2, 1),
+      opacity 70ms ease;
+  }
+
+  .title-flight-fade {
+    opacity: 0;
+  }
+
+  .title-hidden {
+    opacity: 0;
+  }
+
+  .back-button {
+    margin-bottom: 2rem;
+    color: var(--accent);
+    border: 1px solid rgba(var(--accent-rgb), 0.35);
+    background: rgba(var(--accent-rgb), 0.06);
+    padding: 0.85rem 1rem;
+    border-radius: 999px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+    cursor: pointer;
+    transition:
+      transform 0.16s ease,
+      border-color 0.16s ease,
+      background 0.16s ease;
+  }
+
+  .back-button:hover {
+    transform: translateX(-4px);
+    border-color: var(--accent);
+    background: rgba(var(--accent-rgb), 0.12);
+  }
+
+  .project-work-hero {
+    display: grid;
+    grid-template-columns: 1fr 1.05fr;
+    gap: 1.5rem;
+    align-items: stretch;
+    margin-bottom: 1.5rem;
+  }
+
+  .detail-media {
+    min-height: 320px;
+    border: 1px dashed rgba(var(--accent-rgb), 0.35);
+    border-radius: 14px;
+    display: grid;
+    place-items: center;
+    background:
+      linear-gradient(135deg, rgba(var(--accent-rgb), 0.08), transparent 45%),
+      var(--bg-light);
+    color: var(--accent);
+    text-align: center;
+    padding: 1.5rem;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+  }
+
+  .large-media {
+    min-height: 420px;
+  }
+
+  .detail-panel,
+  .detail-wide-section {
+    border: 1px solid rgba(var(--accent-rgb), 0.12);
+    background:
+      linear-gradient(135deg, rgba(var(--accent-rgb), 0.04), transparent 35%),
+      var(--bg-light);
+    border-radius: 14px;
+    padding: 1.5rem;
+  }
+
+  .project-summary-card {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  .detail-time {
+    color: var(--accent);
+    margin: 0 0 1rem;
+  }
+
+  .detail-description {
+    color: var(--muted);
+    line-height: 1.8;
+    font-size: 1.05rem;
+    margin: 0;
+  }
+
+  .detail-layout {
+    display: grid;
+    grid-template-columns: 1.1fr 1fr;
+    gap: 1.5rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .detail-bullet-list {
+    margin: 0;
+    padding-left: 1.1rem;
+    color: var(--muted);
+    line-height: 1.8;
+  }
+
+  .detail-bullet-list li::marker {
+    color: var(--accent);
+  }
+
+  .placeholder-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.9rem;
+  }
+
+  .mini-photo-placeholder {
+    min-height: 135px;
+    border: 1px dashed rgba(var(--accent-rgb), 0.28);
+    border-radius: 10px;
+    background: rgba(var(--accent-rgb), 0.035);
+    color: var(--accent);
+    display: grid;
+    place-items: center;
+    text-align: center;
+    padding: 1rem;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+    font-size: 0.9rem;
+  }
+
+  .detail-section-stack {
+    display: grid;
+    gap: 1.5rem;
+  }
+
+  .detail-wide-section {
+    display: grid;
+    grid-template-columns: 1.1fr 0.9fr;
+    gap: 1.5rem;
+    align-items: center;
+  }
+
+  .section-media {
+    min-height: 260px;
   }
 
   .main-education {
@@ -749,12 +2065,42 @@
     }
 
     .project-grid,
-    .education-grid {
+    .education-grid,
+    .project-work-hero,
+    .detail-layout,
+    .detail-wide-section {
       grid-template-columns: 1fr;
+    }
+
+    .category-page-header h2,
+    .individual-page-header h2 {
+      font-size: 2.4rem;
+      white-space: normal;
+    }
+
+    .project-row {
+      grid-template-columns: 1fr;
+      align-items: start;
+    }
+
+    .project-row-tags {
+      margin-left: 3.5rem;
+    }
+
+    .project-row-action {
+      margin-left: 3.5rem;
     }
 
     .main-education {
       grid-column: span 1;
+    }
+
+    .large-media {
+      min-height: 260px;
+    }
+
+    .placeholder-grid {
+      grid-template-columns: 1fr;
     }
 
     .timeline {
