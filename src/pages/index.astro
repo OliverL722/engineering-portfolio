@@ -384,6 +384,9 @@
       const revealItems = document.querySelectorAll(".reveal");
       const typewriteElements = document.querySelectorAll(".typewrite");
 
+      const projectsScreen = document.querySelector("#projects");
+      const topNav = document.querySelector(".top-nav");
+
       const projectCards = document.querySelectorAll(".project-category-card");
       const projectsOverview = document.querySelector("#projectsOverview");
       const projectCategoryPage = document.querySelector("#projectCategoryPage");
@@ -930,10 +933,43 @@
         });
       }
 
+      function jumpToProjectsTop() {
+        const navHeight = topNav?.offsetHeight || 82;
+        const projectTop = projectsScreen.getBoundingClientRect().top + window.scrollY;
+        const targetTop = Math.max(0, projectTop - navHeight - 8);
+
+        window.scrollTo({
+          top: targetTop,
+          behavior: "auto"
+        });
+      }
+
+      function afterLayout(callback) {
+        requestAnimationFrame(() => {
+          requestAnimationFrame(callback);
+        });
+      }
+
+      function getTextRect(element) {
+        if (!element) return null;
+
+        const range = document.createRange();
+        range.selectNodeContents(element);
+
+        const rect = range.getBoundingClientRect();
+        range.detach();
+
+        if (rect.width > 0 && rect.height > 0) {
+          return rect;
+        }
+
+        return element.getBoundingClientRect();
+      }
+
       function getTitleSnapshot(element) {
         if (!element) return null;
 
-        const rect = element.getBoundingClientRect();
+        const rect = getTextRect(element);
         const styles = window.getComputedStyle(element);
 
         return {
@@ -941,10 +977,13 @@
           left: rect.left,
           top: rect.top,
           width: rect.width,
+          height: rect.height,
           fontSizeNumber: parseFloat(styles.fontSize) || 16,
+          fontFamily: styles.fontFamily,
           fontWeight: styles.fontWeight,
           letterSpacing: styles.letterSpacing,
-          lineHeight: styles.lineHeight
+          lineHeight: styles.lineHeight,
+          textTransform: styles.textTransform
         };
       }
 
@@ -954,47 +993,59 @@
           return;
         }
 
-        const toRect = toElement.getBoundingClientRect();
+        const toRect = getTextRect(toElement);
         const toStyles = window.getComputedStyle(toElement);
         const targetFontSize = parseFloat(toStyles.fontSize) || snapshot.fontSizeNumber;
         const startScale = snapshot.fontSizeNumber / targetFontSize;
-
-        const startX = snapshot.left;
-        const startY = snapshot.top;
-        const endX = toRect.left;
-        const endY = toRect.top;
 
         const clone = document.createElement("div");
         clone.className = "title-flight";
         clone.textContent = snapshot.text;
 
         clone.style.setProperty("--flight-duration", `${duration}ms`);
-        clone.style.left = `${startX}px`;
-        clone.style.top = `${startY}px`;
-        clone.style.width = `${Math.max(toRect.width, snapshot.width / startScale)}px`;
+        clone.style.left = `${snapshot.left}px`;
+        clone.style.top = `${snapshot.top}px`;
+        clone.style.width = `${toRect.width}px`;
+        clone.style.fontFamily = toStyles.fontFamily;
         clone.style.fontSize = toStyles.fontSize;
         clone.style.fontWeight = toStyles.fontWeight;
         clone.style.letterSpacing = toStyles.letterSpacing;
         clone.style.lineHeight = toStyles.lineHeight;
+        clone.style.textTransform = toStyles.textTransform;
         clone.style.transform = `translate3d(0, 0, 0) scale(${startScale})`;
 
         document.body.appendChild(clone);
         toElement.classList.add("title-hidden");
 
         requestAnimationFrame(() => {
-          clone.style.transform = `translate3d(${endX - startX}px, ${endY - startY}px, 0) scale(1)`;
+          const endX = toRect.left - snapshot.left;
+          const endY = toRect.top - snapshot.top;
+
+          clone.style.transform = `translate3d(${endX}px, ${endY}px, 0) scale(1)`;
         });
 
-        setTimeout(() => {
+        let done = false;
+
+        function finish() {
+          if (done) return;
+          done = true;
+
+          toElement.classList.add("title-fade-in");
           toElement.classList.remove("title-hidden");
           clone.classList.add("title-flight-fade");
 
           setTimeout(() => {
             clone.remove();
-
+            toElement.classList.remove("title-fade-in");
             if (callback) callback();
-          }, 70);
-        }, duration);
+          }, 130);
+        }
+
+        clone.addEventListener("transitionend", (e) => {
+          if (e.propertyName === "transform") finish();
+        });
+
+        setTimeout(finish, duration + 100);
       }
 
       function fillTags(container, tags) {
@@ -1138,21 +1189,18 @@
         setTimeout(() => {
           projectsOverview.hidden = true;
           projectCategoryPage.hidden = false;
-          projectCategoryPage.classList.remove("closing");
+          projectCategoryPage.classList.remove("closing", "overview-exiting");
+
+          jumpToProjectsTop();
 
           requestAnimationFrame(() => {
             projectCategoryPage.classList.add("active");
 
-            setTimeout(() => {
+            afterLayout(() => {
               animateTitleSnapshot(titleSnapshot, categoryTitle, () => {
                 card.classList.remove("launching");
               }, 280);
-            }, 30);
-          });
-
-          projectCategoryPage.scrollIntoView({
-            behavior: "smooth",
-            block: "start"
+            });
           });
         }, 130);
       }
@@ -1169,7 +1217,6 @@
         }
 
         const titleSnapshot = getTitleSnapshot(categoryTitle);
-        const targetTitle = activeCategoryCard?.querySelector(".card-title");
 
         projectsOverview.hidden = false;
         projectsOverview.classList.remove("overview-exiting");
@@ -1177,12 +1224,10 @@
         projectCategoryPage.classList.remove("active");
         projectCategoryPage.classList.add("closing");
 
-        projectsOverview.scrollIntoView({
-          behavior: "auto",
-          block: "start"
-        });
+        jumpToProjectsTop();
 
-        requestAnimationFrame(() => {
+        afterLayout(() => {
+          const targetTitle = activeCategoryCard?.querySelector(".card-title");
           animateTitleSnapshot(titleSnapshot, targetTitle, null, 220);
         });
 
@@ -1212,21 +1257,18 @@
         setTimeout(() => {
           projectCategoryPage.hidden = true;
           individualProjectPage.hidden = false;
-          individualProjectPage.classList.remove("closing");
+          individualProjectPage.classList.remove("closing", "overview-exiting");
+
+          jumpToProjectsTop();
 
           requestAnimationFrame(() => {
             individualProjectPage.classList.add("active");
 
-            setTimeout(() => {
+            afterLayout(() => {
               animateTitleSnapshot(titleSnapshot, individualTitle, () => {
                 sourceRow.classList.remove("launching");
               }, 280);
-            }, 30);
-          });
-
-          individualProjectPage.scrollIntoView({
-            behavior: "smooth",
-            block: "start"
+            });
           });
         }, 130);
       }
@@ -1244,7 +1286,6 @@
         }
 
         const titleSnapshot = getTitleSnapshot(individualTitle);
-        const targetTitle = activeProjectRow?.querySelector("h3");
 
         projectCategoryPage.hidden = false;
         projectCategoryPage.classList.remove("overview-exiting", "closing", "behind-detail");
@@ -1253,12 +1294,10 @@
         individualProjectPage.classList.remove("active");
         individualProjectPage.classList.add("closing");
 
-        projectCategoryPage.scrollIntoView({
-          behavior: "auto",
-          block: "start"
-        });
+        jumpToProjectsTop();
 
-        requestAnimationFrame(() => {
+        afterLayout(() => {
+          const targetTitle = activeProjectRow?.querySelector("h3");
           animateTitleSnapshot(titleSnapshot, targetTitle, null, 220);
         });
 
@@ -1573,23 +1612,17 @@
 
   .detail-page {
     opacity: 0;
-    transform: scale(0.975) translateY(12px);
-    transform-origin: center top;
-    transition:
-      opacity 0.18s ease,
-      transform 0.18s ease;
-    will-change: opacity, transform;
+    transition: opacity 0.18s ease;
+    will-change: opacity;
   }
 
   .detail-page.active {
     opacity: 1;
-    transform: scale(1) translateY(0);
   }
 
   .detail-page.closing,
   .detail-page.overview-exiting {
     opacity: 0;
-    transform: scale(0.975) translateY(12px);
     pointer-events: none;
   }
 
@@ -1725,6 +1758,7 @@
     z-index: 20000;
     color: var(--white);
     margin: 0;
+    padding: 0;
     pointer-events: none;
     white-space: nowrap;
     transform-origin: left top;
@@ -1743,6 +1777,10 @@
 
   .title-hidden {
     opacity: 0;
+  }
+
+  .title-fade-in {
+    transition: opacity 100ms ease;
   }
 
   .back-button {
