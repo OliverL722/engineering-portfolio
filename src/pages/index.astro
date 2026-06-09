@@ -415,6 +415,7 @@
       let activeCategoryCard = null;
       let activeProjectRow = null;
       let savedScrollY = 0;
+      let savedRowScrollY = 0;
       let isAnimating = false;
       let mouseX = 0, mouseY = 0;
       document.addEventListener("mousemove", e => { mouseX = e.clientX; mouseY = e.clientY; });
@@ -1106,7 +1107,10 @@
           fontSize: cardFontSize + "px",
           fontWeight: cardStyles.fontWeight,
           fontFamily: cardStyles.fontFamily,
-          lineHeight: "1",
+          fontStyle: cardStyles.fontStyle,
+          fontStretch: cardStyles.fontStretch,
+          lineHeight: cardStyles.lineHeight,
+          letterSpacing: cardStyles.letterSpacing,
           color: cardStyles.color,
           whiteSpace: "nowrap",
           margin: "0",
@@ -1115,6 +1119,8 @@
           pointerEvents: "none",
           transformOrigin: "0 0",
         });
+        titleClone.style.setProperty("-webkit-font-smoothing", getComputedStyle(cardTitleEl).getPropertyValue("-webkit-font-smoothing") || "antialiased");
+        titleClone.style.setProperty("-moz-osx-font-smoothing", "grayscale");
         document.body.appendChild(titleClone);
 
         // Measure how far the clone's ink overflows above its own element top.
@@ -1249,7 +1255,10 @@
             fontSize: catFontSize + "px",
             fontWeight: catStyles.fontWeight,
             fontFamily: catStyles.fontFamily,
-            lineHeight: "1",
+            fontStyle: catStyles.fontStyle,
+            fontStretch: catStyles.fontStretch,
+            lineHeight: catStyles.lineHeight,
+            letterSpacing: catStyles.letterSpacing,
             color: catStyles.color,
             whiteSpace: "nowrap",
             margin: "0",
@@ -1258,6 +1267,8 @@
             pointerEvents: "none",
             transformOrigin: "0 0",
           });
+          titleClone.style.setProperty("-webkit-font-smoothing", getComputedStyle(categoryTitle).getPropertyValue("-webkit-font-smoothing") || "antialiased");
+          titleClone.style.setProperty("-moz-osx-font-smoothing", "grayscale");
           document.body.appendChild(titleClone);
 
           // Measure ink overflow at catFontSize — at this size it's large and must be corrected
@@ -1370,33 +1381,116 @@
       }
 
       function openIndividualProject(projectIndex, sourceRow) {
+        if (isAnimating) return;
         const category = projectData[activeCategoryId];
         const project = category?.projects[projectIndex];
-
         if (!project || !category) return;
+        isAnimating = true;
 
         activeProjectRow = sourceRow;
-
         populateIndividual(project, category);
 
-        sourceRow.classList.add("launching");
+        // Capture row positions before any page changes.
+        const rect = sourceRow.getBoundingClientRect();
+        const rowTitleEl = sourceRow.querySelector(".project-row-text h3");
+        const rowStyles = getComputedStyle(rowTitleEl);
+        const rowFontSize = parseFloat(rowStyles.fontSize);
+
+        const rowRange = document.createRange();
+        rowRange.selectNodeContents(rowTitleEl);
+        const rowTextRect = rowRange.getBoundingClientRect();
+
+        // Spawn clone before page swap so the title is never invisible.
+        const titleClone = document.createElement("div");
+        titleClone.textContent = rowTitleEl.textContent.trim();
+        Object.assign(titleClone.style, {
+          position: "fixed",
+          left: rowTextRect.left + "px",
+          top: rowTextRect.top + "px",
+          fontSize: rowFontSize + "px",
+          fontWeight: rowStyles.fontWeight,
+          fontFamily: rowStyles.fontFamily,
+          fontStyle: rowStyles.fontStyle,
+          fontStretch: rowStyles.fontStretch,
+          lineHeight: rowStyles.lineHeight,
+          letterSpacing: rowStyles.letterSpacing,
+          color: rowStyles.color,
+          whiteSpace: "nowrap",
+          margin: "0",
+          padding: "0",
+          zIndex: "10001",
+          pointerEvents: "none",
+          transformOrigin: "0 0",
+        });
+        titleClone.style.setProperty("-webkit-font-smoothing", getComputedStyle(rowTitleEl).getPropertyValue("-webkit-font-smoothing") || "antialiased");
+        titleClone.style.setProperty("-moz-osx-font-smoothing", "grayscale");
+        document.body.appendChild(titleClone);
+
+        const cloneTestRange = document.createRange();
+        cloneTestRange.selectNodeContents(titleClone);
+        const cloneInkOffset = cloneTestRange.getBoundingClientRect().top - titleClone.getBoundingClientRect().top;
+
+        // Save scroll before page swap.
+        savedRowScrollY = window.scrollY;
+
+        // Swap pages.
+        projectCategoryPage.hidden = true;
         projectCategoryPage.classList.remove("active");
-        projectCategoryPage.classList.add("overview-exiting");
+        individualProjectPage.hidden = false;
+        individualProjectPage.classList.remove("closing", "overview-exiting");
+
+        jumpToProjectsTop();
+
+        // Measure individual title at new scroll position.
+        const indivRange = document.createRange();
+        indivRange.selectNodeContents(individualTitle);
+        const indivTextRect = indivRange.getBoundingClientRect();
+        const indivFontSize = parseFloat(getComputedStyle(individualTitle).fontSize);
+
+        const endScale = indivFontSize > 0 ? indivFontSize / rowFontSize : 1;
+        const tx = indivTextRect.left - rowTextRect.left;
+        const ty = indivTextRect.top - rowTextRect.top - cloneInkOffset * endScale - 1;
+
+        individualTitle.style.opacity = "0";
+        individualProjectPage.classList.add("active");
+
+        const hero = document.createElement("div");
+        hero.id = "card-expand-hero";
+        hero.style.left = rect.left + "px";
+        hero.style.top = rect.top + "px";
+        hero.style.width = rect.width + "px";
+        hero.style.height = rect.height + "px";
+        hero.style.borderRadius = "14px";
+        document.body.appendChild(hero);
+
+        requestAnimationFrame(() => {
+          requestAnimationFrame(() => {
+            hero.style.left = "0px";
+            hero.style.top = "0px";
+            hero.style.width = "100vw";
+            hero.style.height = "100vh";
+            hero.style.borderRadius = "0px";
+            hero.classList.add("hero-fade-out");
+
+            titleClone.style.transition = "transform 0.32s cubic-bezier(0.4, 0, 0.2, 1)";
+            titleClone.style.transform = `translate(${tx}px, ${ty}px) scale(${endScale})`;
+          });
+        });
 
         setTimeout(() => {
-          projectCategoryPage.hidden = true;
-          individualProjectPage.hidden = false;
-          individualProjectPage.classList.remove("closing", "overview-exiting");
-          jumpToProjectsTop();
           requestAnimationFrame(() => {
-            individualProjectPage.classList.add("active");
-            sourceRow.classList.remove("launching");
+            individualTitle.style.opacity = "";
+            titleClone.remove();
           });
-        }, 130);
+          isAnimating = false;
+          setTimeout(() => hero.remove(), 200);
+        }, 320);
       }
 
       function closeIndividualProject(animate = true) {
+        if (isAnimating) return;
         if (individualProjectPage.hidden) return;
+        isAnimating = true;
 
         if (!animate) {
           individualProjectPage.hidden = true;
@@ -1404,21 +1498,135 @@
           projectCategoryPage.hidden = false;
           projectCategoryPage.classList.add("active");
           projectCategoryPage.classList.remove("overview-exiting");
+          isAnimating = false;
           return;
         }
 
+        const currentScrollY = window.scrollY;
+        const scrollDelta = savedRowScrollY - currentScrollY;
+
+        // Measure individual title BEFORE showing category page (layout shift guard).
+        const indivStyles = getComputedStyle(individualTitle);
+        const indivFontSize = parseFloat(indivStyles.fontSize);
+        const indivRange = document.createRange();
+        indivRange.selectNodeContents(individualTitle);
+        const indivTextRect = indivRange.getBoundingClientRect();
+
+        // Show category page.
         projectCategoryPage.hidden = false;
         projectCategoryPage.classList.remove("overview-exiting", "closing", "behind-detail");
         projectCategoryPage.classList.add("active");
 
+        // Measure row at currentScrollY with hover neutralized.
+        const rowTitleEl = activeProjectRow ? activeProjectRow.querySelector(".project-row-text h3") : null;
+        const rowRect = activeProjectRow ? activeProjectRow.getBoundingClientRect() : null;
+        let rowTextRect = null;
+        let rowFontSize = 0;
+        if (rowTitleEl && activeProjectRow) {
+          activeProjectRow.style.transition = "none";
+          activeProjectRow.style.transform = "translateY(0)";
+          void activeProjectRow.offsetHeight;
+          const rowStyles = getComputedStyle(rowTitleEl);
+          rowFontSize = parseFloat(rowStyles.fontSize);
+          const rowRange = document.createRange();
+          rowRange.selectNodeContents(rowTitleEl);
+          rowTextRect = rowRange.getBoundingClientRect();
+          activeProjectRow.style.transform = "";
+          activeProjectRow.style.transition = "";
+        }
+
+        if (rowTextRect) {
+          const titleClone = document.createElement("div");
+          titleClone.textContent = individualTitle.textContent.trim();
+          Object.assign(titleClone.style, {
+            position: "fixed",
+            left: indivTextRect.left + "px",
+            top: indivTextRect.top + "px",
+            fontSize: indivFontSize + "px",
+            fontWeight: indivStyles.fontWeight,
+            fontFamily: indivStyles.fontFamily,
+            fontStyle: indivStyles.fontStyle,
+            fontStretch: indivStyles.fontStretch,
+            lineHeight: indivStyles.lineHeight,
+            letterSpacing: indivStyles.letterSpacing,
+            color: indivStyles.color,
+            whiteSpace: "nowrap",
+            margin: "0",
+            padding: "0",
+            zIndex: "10001",
+            pointerEvents: "none",
+            transformOrigin: "0 0",
+          });
+          titleClone.style.setProperty("-webkit-font-smoothing", getComputedStyle(individualTitle).getPropertyValue("-webkit-font-smoothing") || "antialiased");
+          titleClone.style.setProperty("-moz-osx-font-smoothing", "grayscale");
+          document.body.appendChild(titleClone);
+
+          const cloneTestRange = document.createRange();
+          cloneTestRange.selectNodeContents(titleClone);
+          const cloneInkOffset = cloneTestRange.getBoundingClientRect().top - titleClone.getBoundingClientRect().top;
+
+          titleClone.style.top = (indivTextRect.top - cloneInkOffset) + "px";
+
+          const revScale = indivFontSize > 0 ? rowFontSize / indivFontSize : 1;
+          const tx = rowTextRect.left - indivTextRect.left;
+          const tyBase = rowTextRect.top - indivTextRect.top + cloneInkOffset * (1 - revScale) - scrollDelta;
+
+          individualTitle.style.opacity = "0";
+
+          const hero = document.createElement("div");
+          hero.id = "card-expand-hero";
+          hero.style.left = "0px";
+          hero.style.top = "0px";
+          hero.style.width = "100vw";
+          hero.style.height = "100vh";
+          hero.style.borderRadius = "0px";
+          document.body.appendChild(hero);
+
+          window.scrollTo({ top: savedRowScrollY, behavior: "auto" });
+
+          individualProjectPage.hidden = true;
+          individualProjectPage.classList.remove("active", "closing");
+
+          requestAnimationFrame(() => {
+            requestAnimationFrame(() => {
+              const elemUnder = document.elementFromPoint(mouseX, mouseY);
+              const rowHovered = activeProjectRow.contains(elemUnder) || activeProjectRow === elemUnder;
+              const ty = tyBase + (rowHovered ? -2 : -4);
+
+              if (rowRect) {
+                hero.style.left = rowRect.left + "px";
+                hero.style.top = (rowRect.top - scrollDelta) + "px";
+                hero.style.width = rowRect.width + "px";
+                hero.style.height = rowRect.height + "px";
+                hero.style.borderRadius = "14px";
+              }
+              titleClone.style.transition = "transform 0.32s cubic-bezier(0.4, 0, 0.2, 1)";
+              titleClone.style.transform = `translate(${tx}px, ${ty}px) scale(${revScale})`;
+            });
+          });
+
+          setTimeout(() => {
+            hero.classList.add("hero-fade-out");
+            titleClone.remove();
+          }, 320);
+
+          setTimeout(() => {
+            individualTitle.style.opacity = "";
+            hero.remove();
+            isAnimating = false;
+          }, 680);
+
+          return;
+        }
+
+        // Fallback: no row reference.
         individualProjectPage.classList.remove("active");
         individualProjectPage.classList.add("closing");
-
         jumpToProjectsTop();
-
         setTimeout(() => {
           individualProjectPage.hidden = true;
           individualProjectPage.classList.remove("closing");
+          isAnimating = false;
         }, 210);
       }
 
