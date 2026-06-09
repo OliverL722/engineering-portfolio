@@ -414,6 +414,7 @@
       let activeCategoryId = null;
       let activeCategoryCard = null;
       let activeProjectRow = null;
+      let savedScrollY = 0;
 
       const projectData = {
         completed: {
@@ -1119,6 +1120,10 @@
         cloneTestRange.selectNodeContents(titleClone);
         const cloneInkOffset = cloneTestRange.getBoundingClientRect().top - titleClone.getBoundingClientRect().top;
 
+        // Save scroll before the page swap — hiding the overview can shift document
+        // height and corrupt window.scrollY if read after.
+        savedScrollY = window.scrollY;
+
         // Swap pages — clone already covers the card title so there's no visible gap.
         projectsOverview.hidden = true;
         projectCategoryPage.hidden = false;
@@ -1186,11 +1191,12 @@
           return;
         }
 
-        jumpToProjectsTop();
+        // Snapshot current scroll — all measurements happen here so positions are consistent.
+        const currentScrollY = window.scrollY;
+        // Delta to apply to card-side positions so they reflect where savedScrollY puts them.
+        const scrollDelta = savedScrollY - currentScrollY;
 
-        // Measure category title BEFORE showing the overview — once both pages are
-        // in the DOM simultaneously, the category page gets pushed below the overview
-        // in layout and catTextRect.top becomes a huge off-screen value.
+        // Measure category title BEFORE showing the overview (layout shift would corrupt it).
         const catStyles = getComputedStyle(categoryTitle);
         const catFontSize = parseFloat(catStyles.fontSize);
         const catRange = document.createRange();
@@ -1200,18 +1206,26 @@
         projectsOverview.hidden = false;
         projectsOverview.classList.remove("overview-exiting");
 
+        // Measure card positions at currentScrollY, then adjust by scrollDelta so they
+        // match where the card will be once scroll is restored to savedScrollY.
         const rect = activeCategoryCard ? activeCategoryCard.getBoundingClientRect() : null;
 
-        // Measure card title ink bounds (overview now visible).
+        // Force hover transform to neutral before measuring so cursor-over-card
+        // doesn't shift the target position by 4px.
         const cardTitleEl = activeCategoryCard ? activeCategoryCard.querySelector(".card-title") : null;
         let cardTextRect = null;
         let cardFontSize = 0;
         if (cardTitleEl) {
+          activeCategoryCard.style.transition = "none";
+          activeCategoryCard.style.transform = "translateY(0)";
+          void activeCategoryCard.offsetHeight; // force reflow
           const cardStyles = getComputedStyle(cardTitleEl);
           cardFontSize = parseFloat(cardStyles.fontSize);
           const cardRange = document.createRange();
           cardRange.selectNodeContents(cardTitleEl);
           cardTextRect = cardRange.getBoundingClientRect();
+          activeCategoryCard.style.transform = "";
+          activeCategoryCard.style.transition = "";
         }
 
         // Spawn clone of the category title before hiding the page.
@@ -1248,8 +1262,9 @@
 
           const revScale = catFontSize > 0 ? cardFontSize / catFontSize : 1;
           const tx = cardTextRect.left - catTextRect.left;
-          // ty brings clone ink to cardTextRect.top after scale, accounting for offset shrinking with scale.
-          const ty = cardTextRect.top - catTextRect.top + cloneInkOffset * (1 - revScale) + .5;
+          // ty brings clone ink to card title position at savedScrollY (subtract scrollDelta
+          // to account for the vertical shift when scroll is restored).
+          const ty = cardTextRect.top - catTextRect.top + cloneInkOffset * (1 - revScale) + .5 - scrollDelta;
 
           categoryTitle.style.opacity = "0";
 
@@ -1262,6 +1277,9 @@
           hero.style.borderRadius = "0px";
           document.body.appendChild(hero);
 
+          // Restore scroll now — hero covers the page so the jump is invisible.
+          window.scrollTo({ top: savedScrollY, behavior: "auto" });
+
           projectCategoryPage.hidden = true;
           projectCategoryPage.classList.remove("active", "closing");
 
@@ -1269,7 +1287,8 @@
             requestAnimationFrame(() => {
               if (rect) {
                 hero.style.left = rect.left + "px";
-                hero.style.top = rect.top + "px";
+                // Adjust target top for scroll restoration delta.
+                hero.style.top = (rect.top - scrollDelta) + "px";
                 hero.style.width = rect.width + "px";
                 hero.style.height = rect.height + "px";
                 hero.style.borderRadius = "10px";
@@ -1308,6 +1327,8 @@
         hero.style.borderRadius = "0px";
         document.body.appendChild(hero);
 
+        window.scrollTo({ top: savedScrollY, behavior: "auto" });
+
         projectCategoryPage.hidden = true;
         projectCategoryPage.classList.remove("active", "closing");
 
@@ -1315,7 +1336,7 @@
           requestAnimationFrame(() => {
             if (rect) {
               hero.style.left = rect.left + "px";
-              hero.style.top = rect.top + "px";
+              hero.style.top = (rect.top - scrollDelta) + "px";
               hero.style.width = rect.width + "px";
               hero.style.height = rect.height + "px";
               hero.style.borderRadius = "10px";
