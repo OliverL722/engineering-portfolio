@@ -1077,10 +1077,73 @@
 
         populateCategory(category);
 
+        // Capture card positions at the user's current scroll — no forced scroll yet.
         const rect = card.getBoundingClientRect();
+        const cardTitleEl = card.querySelector(".card-title");
+        const cardStyles = getComputedStyle(cardTitleEl);
+        const cardFontSize = parseFloat(cardStyles.fontSize);
 
-        card.classList.add("expanding");
-        projectsOverview.classList.add("overview-exiting");
+        // Range gives the actual rendered text bounds, not the full block element bounds.
+        // This is critical for left-aligned text where element width != text width.
+        const cardRange = document.createRange();
+        cardRange.selectNodeContents(cardTitleEl);
+        const cardTextRect = cardRange.getBoundingClientRect();
+
+        // Spawn clone BEFORE hiding the overview so the card title is never invisible.
+        // Clone matches the card title exactly so the swap is seamless.
+        const titleClone = document.createElement("div");
+        titleClone.textContent = cardTitleEl.textContent.trim();
+        Object.assign(titleClone.style, {
+          position: "fixed",
+          left: cardTextRect.left + "px",
+          top: cardTextRect.top + "px",
+          fontSize: cardFontSize + "px",
+          fontWeight: cardStyles.fontWeight,
+          fontFamily: cardStyles.fontFamily,
+          lineHeight: "1",
+          color: cardStyles.color,
+          whiteSpace: "nowrap",
+          margin: "0",
+          padding: "0",
+          zIndex: "10001",
+          pointerEvents: "none",
+          transformOrigin: "0 0",
+        });
+        document.body.appendChild(titleClone);
+
+        // Measure how far the clone's ink overflows above its own element top.
+        // Font metrics cause rendered glyphs to sit above the element edge even
+        // with lineHeight:"1". At card size this is ~2px (invisible), but after
+        // scaling to heading size it becomes 8–10px — the visible end-of-animation snap.
+        const cloneTestRange = document.createRange();
+        cloneTestRange.selectNodeContents(titleClone);
+        const cloneInkOffset = cloneTestRange.getBoundingClientRect().top - titleClone.getBoundingClientRect().top;
+
+        // Swap pages — clone already covers the card title so there's no visible gap.
+        projectsOverview.hidden = true;
+        projectCategoryPage.hidden = false;
+        projectCategoryPage.classList.remove("closing", "overview-exiting");
+
+        // Scroll now, while the hero (spawned below) covers everything.
+        // The clone is position:fixed so it stays at the card's viewport position regardless.
+        jumpToProjectsTop();
+
+        // Measure the category title's actual text bounds with Range at the new scroll position.
+        const catRange = document.createRange();
+        catRange.selectNodeContents(categoryTitle);
+        const catTextRect = catRange.getBoundingClientRect();
+        const catFontSize = parseFloat(getComputedStyle(categoryTitle).fontSize);
+
+        // Forward transform: clone scales up from card font size to category font size
+        // and translates from card text position to category text position.
+        // Subtract cloneInkOffset*endScale to compensate for the ink overflow that
+        // scales up with the font, otherwise the clone lands above the real title.
+        const endScale = catFontSize > 0 ? catFontSize / cardFontSize : 1;
+        const tx = catTextRect.left - cardTextRect.left;
+        const ty = catTextRect.top - cardTextRect.top - cloneInkOffset * endScale - 1;
+
+        categoryTitle.style.opacity = "0";
+        projectCategoryPage.classList.add("active");
 
         const hero = document.createElement("div");
         hero.id = "card-expand-hero";
@@ -1099,18 +1162,17 @@
             hero.style.height = "100vh";
             hero.style.borderRadius = "0px";
             hero.classList.add("hero-fade-out");
+
+            titleClone.style.transition = "transform 0.42s cubic-bezier(0.4, 0, 0.2, 1)";
+            titleClone.style.transform = `translate(${tx}px, ${ty}px) scale(${endScale})`;
           });
         });
 
         setTimeout(() => {
-          projectsOverview.hidden = true;
-          projectCategoryPage.hidden = false;
-          projectCategoryPage.classList.remove("closing", "overview-exiting");
-          projectCategoryPage.classList.add("active");
-          card.classList.remove("expanding");
-          jumpToProjectsTop();
-          setTimeout(() => hero.remove(), 580);
-        }, 280);
+          categoryTitle.style.opacity = "";
+          titleClone.remove();
+          setTimeout(() => hero.remove(), 200);
+        }, 480);
       }
 
       function closeCategory(animate = true) {
@@ -1126,10 +1188,115 @@
 
         jumpToProjectsTop();
 
+        // Measure category title BEFORE showing the overview — once both pages are
+        // in the DOM simultaneously, the category page gets pushed below the overview
+        // in layout and catTextRect.top becomes a huge off-screen value.
+        const catStyles = getComputedStyle(categoryTitle);
+        const catFontSize = parseFloat(catStyles.fontSize);
+        const catRange = document.createRange();
+        catRange.selectNodeContents(categoryTitle);
+        const catTextRect = catRange.getBoundingClientRect();
+
         projectsOverview.hidden = false;
         projectsOverview.classList.remove("overview-exiting");
 
         const rect = activeCategoryCard ? activeCategoryCard.getBoundingClientRect() : null;
+
+        // Measure card title ink bounds (overview now visible).
+        const cardTitleEl = activeCategoryCard ? activeCategoryCard.querySelector(".card-title") : null;
+        let cardTextRect = null;
+        let cardFontSize = 0;
+        if (cardTitleEl) {
+          const cardStyles = getComputedStyle(cardTitleEl);
+          cardFontSize = parseFloat(cardStyles.fontSize);
+          const cardRange = document.createRange();
+          cardRange.selectNodeContents(cardTitleEl);
+          cardTextRect = cardRange.getBoundingClientRect();
+        }
+
+        // Spawn clone of the category title before hiding the page.
+        let titleClone = null;
+        if (cardTextRect) {
+          titleClone = document.createElement("div");
+          titleClone.textContent = categoryTitle.textContent.trim();
+          Object.assign(titleClone.style, {
+            position: "fixed",
+            left: catTextRect.left + "px",
+            top: catTextRect.top + "px",
+            fontSize: catFontSize + "px",
+            fontWeight: catStyles.fontWeight,
+            fontFamily: catStyles.fontFamily,
+            lineHeight: "1",
+            color: catStyles.color,
+            whiteSpace: "nowrap",
+            margin: "0",
+            padding: "0",
+            zIndex: "10001",
+            pointerEvents: "none",
+            transformOrigin: "0 0",
+          });
+          document.body.appendChild(titleClone);
+
+          // Measure ink overflow at catFontSize — at this size it's large and must be corrected
+          // at both ends of the animation (unlike the forward direction where only the end mattered).
+          const cloneTestRange = document.createRange();
+          cloneTestRange.selectNodeContents(titleClone);
+          const cloneInkOffset = cloneTestRange.getBoundingClientRect().top - titleClone.getBoundingClientRect().top;
+
+          // Shift element down so clone ink aligns with h2 ink at the start.
+          titleClone.style.top = (catTextRect.top - cloneInkOffset) + "px";
+
+          const revScale = catFontSize > 0 ? cardFontSize / catFontSize : 1;
+          const tx = cardTextRect.left - catTextRect.left;
+          // ty brings clone ink to cardTextRect.top after scale, accounting for offset shrinking with scale.
+          const ty = cardTextRect.top - catTextRect.top + cloneInkOffset * (1 - revScale) + .5;
+
+          categoryTitle.style.opacity = "0";
+
+          const hero = document.createElement("div");
+          hero.id = "card-expand-hero";
+          hero.style.left = "0px";
+          hero.style.top = "0px";
+          hero.style.width = "100vw";
+          hero.style.height = "100vh";
+          hero.style.borderRadius = "0px";
+          document.body.appendChild(hero);
+
+          projectCategoryPage.hidden = true;
+          projectCategoryPage.classList.remove("active", "closing");
+
+          requestAnimationFrame(() => {
+            requestAnimationFrame(() => {
+              if (rect) {
+                hero.style.left = rect.left + "px";
+                hero.style.top = rect.top + "px";
+                hero.style.width = rect.width + "px";
+                hero.style.height = rect.height + "px";
+                hero.style.borderRadius = "10px";
+              }
+              titleClone.style.transition = "transform 0.42s cubic-bezier(0.4, 0, 0.2, 1)";
+              titleClone.style.transform = `translate(${tx}px, ${ty}px) scale(${revScale})`;
+            });
+          });
+
+          // The clone lives in document.body (root stacking context) so it sits above
+          // the hero throughout. Keep it visible until the hero is fully faded, then
+          // remove both together — the real card title (always opacity:1) appears
+          // seamlessly with no blank or fade gap.
+          setTimeout(() => {
+            hero.classList.add("hero-fade-out");
+          }, 420);
+
+          setTimeout(() => {
+            titleClone.remove();
+            categoryTitle.style.opacity = "";
+            hero.remove();
+          }, 990);
+
+          return;
+        }
+
+        // Fallback: no card reference, just animate hero.
         if (activeCategoryCard) activeCategoryCard.classList.add("expanding");
 
         const hero = document.createElement("div");
