@@ -415,6 +415,9 @@
       let activeCategoryCard = null;
       let activeProjectRow = null;
       let savedScrollY = 0;
+      let isAnimating = false;
+      let mouseX = 0, mouseY = 0;
+      document.addEventListener("mousemove", e => { mouseX = e.clientX; mouseY = e.clientY; });
 
       const projectData = {
         completed: {
@@ -1070,8 +1073,10 @@
       }
 
       function openCategory(categoryId, card) {
+        if (isAnimating) return;
         const category = projectData[categoryId];
         if (!category) return;
+        isAnimating = true;
 
         activeCategoryId = categoryId;
         activeCategoryCard = card;
@@ -1168,7 +1173,7 @@
             hero.style.borderRadius = "0px";
             hero.classList.add("hero-fade-out");
 
-            titleClone.style.transition = "transform 0.42s cubic-bezier(0.4, 0, 0.2, 1)";
+            titleClone.style.transition = "transform 0.32s cubic-bezier(0.4, 0, 0.2, 1)";
             titleClone.style.transform = `translate(${tx}px, ${ty}px) scale(${endScale})`;
           });
         });
@@ -1176,18 +1181,22 @@
         setTimeout(() => {
           categoryTitle.style.opacity = "";
           titleClone.remove();
+          isAnimating = false;
           setTimeout(() => hero.remove(), 200);
-        }, 480);
+        }, 360);
       }
 
       function closeCategory(animate = true) {
+        if (isAnimating) return;
         if (projectCategoryPage.hidden) return;
+        isAnimating = true;
 
         if (!animate) {
           projectCategoryPage.hidden = true;
           projectCategoryPage.classList.remove("active", "closing");
           projectsOverview.hidden = false;
           projectsOverview.classList.remove("overview-exiting");
+          isAnimating = false;
           return;
         }
 
@@ -1262,9 +1271,8 @@
 
           const revScale = catFontSize > 0 ? cardFontSize / catFontSize : 1;
           const tx = cardTextRect.left - catTextRect.left;
-          // ty brings clone ink to card title position at savedScrollY (subtract scrollDelta
-          // to account for the vertical shift when scroll is restored).
-          const ty = cardTextRect.top - catTextRect.top + cloneInkOffset * (1 - revScale) + .5 - scrollDelta;
+          // tyBase without hover bias — bias is applied in rAF after scroll takes effect.
+          const tyBase = cardTextRect.top - catTextRect.top + cloneInkOffset * (1 - revScale) - scrollDelta;
 
           categoryTitle.style.opacity = "0";
 
@@ -1285,6 +1293,12 @@
 
           requestAnimationFrame(() => {
             requestAnimationFrame(() => {
+              // Check hover after scroll has taken effect using elementFromPoint,
+              // since :hover state doesn't update until the next pointer event.
+              const elemUnder = document.elementFromPoint(mouseX, mouseY);
+              const cardHovered = activeCategoryCard.contains(elemUnder) || activeCategoryCard === elemUnder;
+              const ty = tyBase + (cardHovered ? -4 : 0.5);
+
               if (rect) {
                 hero.style.left = rect.left + "px";
                 // Adjust target top for scroll restoration delta.
@@ -1293,7 +1307,7 @@
                 hero.style.height = rect.height + "px";
                 hero.style.borderRadius = "10px";
               }
-              titleClone.style.transition = "transform 0.42s cubic-bezier(0.4, 0, 0.2, 1)";
+              titleClone.style.transition = "transform 0.32s cubic-bezier(0.4, 0, 0.2, 1)";
               titleClone.style.transform = `translate(${tx}px, ${ty}px) scale(${revScale})`;
             });
           });
@@ -1304,13 +1318,14 @@
           // seamlessly with no blank or fade gap.
           setTimeout(() => {
             hero.classList.add("hero-fade-out");
-          }, 420);
+          }, 320);
 
           setTimeout(() => {
             titleClone.remove();
             categoryTitle.style.opacity = "";
             hero.remove();
-          }, 990);
+            isAnimating = false;
+          }, 680);
 
           return;
         }
@@ -1347,7 +1362,10 @@
         setTimeout(() => {
           hero.classList.add("hero-fade-out");
           if (activeCategoryCard) activeCategoryCard.classList.remove("expanding");
-          setTimeout(() => hero.remove(), 560);
+          setTimeout(() => {
+            hero.remove();
+            isAnimating = false;
+          }, 560);
         }, 280);
       }
 
@@ -1700,12 +1718,12 @@
     box-shadow: 0 0 80px rgba(var(--accent-rgb), 0.15);
     will-change: left, top, width, height;
     transition:
-      left 0.26s cubic-bezier(0.4, 0, 0.2, 1),
-      top 0.26s cubic-bezier(0.4, 0, 0.2, 1),
-      width 0.26s cubic-bezier(0.4, 0, 0.2, 1),
-      height 0.26s cubic-bezier(0.4, 0, 0.2, 1),
-      border-radius 0.26s cubic-bezier(0.4, 0, 0.2, 1),
-      opacity 0.55s ease;
+      left 0.20s cubic-bezier(0.4, 0, 0.2, 1),
+      top 0.20s cubic-bezier(0.4, 0, 0.2, 1),
+      width 0.20s cubic-bezier(0.4, 0, 0.2, 1),
+      height 0.20s cubic-bezier(0.4, 0, 0.2, 1),
+      border-radius 0.20s cubic-bezier(0.4, 0, 0.2, 1),
+      opacity 0.35s ease;
   }
 
   #card-expand-hero.hero-fade-out {
