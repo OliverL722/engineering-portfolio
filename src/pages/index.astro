@@ -420,6 +420,42 @@
       let mouseX = 0, mouseY = 0;
       document.addEventListener("mousemove", e => { mouseX = e.clientX; mouseY = e.clientY; });
 
+      // Hover is disabled on cards and rows for the entire duration of a page
+      // transition. A mid-animation hover lift (translateY(-4px)) moves the real
+      // title while the flying clone heads to a precomputed position, leaving two
+      // copies of the text offset from each other. The body.hover-lock class kills
+      // pointer events on the hover targets until cleanup completes; elementFromPoint
+      // then also correctly reports "not hovered", keeping the landing bias in sync.
+      function setAnimating(value) {
+        isAnimating = value;
+        document.body.classList.toggle("hover-lock", value);
+      }
+
+      // Scrolling is also blocked while a transition runs, for the same reason as
+      // hover: the flying title clone is position:fixed, but its landing position
+      // was measured against the document — scrolling mid-animation moves the real
+      // title while the clone lands at the stale coordinate. Inputs are blocked
+      // rather than using overflow:hidden, which would remove the scrollbar and
+      // reflow the page, corrupting the positions the animation already measured.
+      // Programmatic scrolls (jumpToProjectsTop, scroll restoration) are unaffected.
+      function blockScrollInput(event) {
+        if (isAnimating) event.preventDefault();
+      }
+
+      window.addEventListener("wheel", blockScrollInput, { passive: false });
+      window.addEventListener("touchmove", blockScrollInput, { passive: false });
+
+      const scrollKeys = new Set([
+        "ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight",
+        "PageUp", "PageDown", "Home", "End", " ",
+      ]);
+
+      window.addEventListener("keydown", (event) => {
+        if (isAnimating && scrollKeys.has(event.key)) {
+          event.preventDefault();
+        }
+      });
+
       const projectData = {
         completed: {
           kicker: "01. Completed Projects",
@@ -991,6 +1027,7 @@
 
         fillTags(categoryTags, category.tags);
 
+        categoryProjectRows.classList.remove("no-replay");
         categoryProjectRows.innerHTML = "";
 
         category.projects.forEach((project, index) => {
@@ -1077,7 +1114,7 @@
         if (isAnimating) return;
         const category = projectData[categoryId];
         if (!category) return;
-        isAnimating = true;
+        setAnimating(true);
 
         activeCategoryId = categoryId;
         activeCategoryCard = card;
@@ -1187,7 +1224,7 @@
         setTimeout(() => {
           categoryTitle.style.opacity = "";
           titleClone.remove();
-          isAnimating = false;
+          setAnimating(false);
           setTimeout(() => hero.remove(), 200);
         }, 360);
       }
@@ -1195,14 +1232,14 @@
       function closeCategory(animate = true) {
         if (isAnimating) return;
         if (projectCategoryPage.hidden) return;
-        isAnimating = true;
+        setAnimating(true);
 
         if (!animate) {
           projectCategoryPage.hidden = true;
           projectCategoryPage.classList.remove("active", "closing");
           projectsOverview.hidden = false;
           projectsOverview.classList.remove("overview-exiting");
-          isAnimating = false;
+          setAnimating(false);
           return;
         }
 
@@ -1335,7 +1372,7 @@
             titleClone.remove();
             categoryTitle.style.opacity = "";
             hero.remove();
-            isAnimating = false;
+            setAnimating(false);
           }, 680);
 
           return;
@@ -1375,7 +1412,7 @@
           if (activeCategoryCard) activeCategoryCard.classList.remove("expanding");
           setTimeout(() => {
             hero.remove();
-            isAnimating = false;
+            setAnimating(false);
           }, 560);
         }, 280);
       }
@@ -1385,22 +1422,23 @@
         const category = projectData[activeCategoryId];
         const project = category?.projects[projectIndex];
         if (!project || !category) return;
-        isAnimating = true;
+        setAnimating(true);
 
         activeProjectRow = sourceRow;
         populateIndividual(project, category);
 
-        // Capture row positions before any page changes.
+        // Capture row positions at the user's current scroll — no forced scroll yet.
         const rect = sourceRow.getBoundingClientRect();
         const rowTitleEl = sourceRow.querySelector(".project-row-text h3");
         const rowStyles = getComputedStyle(rowTitleEl);
         const rowFontSize = parseFloat(rowStyles.fontSize);
 
+        // Range gives the actual rendered text bounds, not the full block element bounds.
         const rowRange = document.createRange();
         rowRange.selectNodeContents(rowTitleEl);
         const rowTextRect = rowRange.getBoundingClientRect();
 
-        // Spawn clone before page swap so the title is never invisible.
+        // Spawn clone BEFORE hiding the category page so the row title is never invisible.
         const titleClone = document.createElement("div");
         titleClone.textContent = rowTitleEl.textContent.trim();
         Object.assign(titleClone.style, {
@@ -1426,30 +1464,34 @@
         titleClone.style.setProperty("-moz-osx-font-smoothing", "grayscale");
         document.body.appendChild(titleClone);
 
+        // Measure how far the clone's ink overflows above its own element top —
+        // at heading size this becomes visible, so correct it at the end position.
         const cloneTestRange = document.createRange();
         cloneTestRange.selectNodeContents(titleClone);
         const cloneInkOffset = cloneTestRange.getBoundingClientRect().top - titleClone.getBoundingClientRect().top;
 
-        // Save scroll before page swap.
+        // Save scroll before the page swap.
         savedRowScrollY = window.scrollY;
 
-        // Swap pages.
+        // Swap pages — clone already covers the row title so there's no visible gap.
         projectCategoryPage.hidden = true;
         projectCategoryPage.classList.remove("active");
         individualProjectPage.hidden = false;
         individualProjectPage.classList.remove("closing", "overview-exiting");
 
+        // Scroll now, while the hero (spawned below) covers everything.
         jumpToProjectsTop();
 
-        // Measure individual title at new scroll position.
-        const indivRange = document.createRange();
-        indivRange.selectNodeContents(individualTitle);
-        const indivTextRect = indivRange.getBoundingClientRect();
-        const indivFontSize = parseFloat(getComputedStyle(individualTitle).fontSize);
+        // Measure the individual title's actual text bounds at the new scroll position.
+        const indRange = document.createRange();
+        indRange.selectNodeContents(individualTitle);
+        const indTextRect = indRange.getBoundingClientRect();
+        const indFontSize = parseFloat(getComputedStyle(individualTitle).fontSize);
 
-        const endScale = indivFontSize > 0 ? indivFontSize / rowFontSize : 1;
-        const tx = indivTextRect.left - rowTextRect.left;
-        const ty = indivTextRect.top - rowTextRect.top - cloneInkOffset * endScale - 1;
+        // Forward transform: clone scales up from row font size to heading font size.
+        const endScale = rowFontSize > 0 ? indFontSize / rowFontSize : 1;
+        const tx = indTextRect.left - rowTextRect.left;
+        const ty = indTextRect.top - rowTextRect.top - cloneInkOffset * endScale - 1;
 
         individualTitle.style.opacity = "0";
         individualProjectPage.classList.add("active");
@@ -1478,54 +1520,60 @@
         });
 
         setTimeout(() => {
-          requestAnimationFrame(() => {
-            individualTitle.style.opacity = "";
-            titleClone.remove();
-          });
-          isAnimating = false;
+          individualTitle.style.opacity = "";
+          titleClone.remove();
+          setAnimating(false);
           setTimeout(() => hero.remove(), 200);
-        }, 320);
+        }, 360);
       }
 
       function closeIndividualProject(animate = true) {
         if (isAnimating) return;
         if (individualProjectPage.hidden) return;
-        isAnimating = true;
+        setAnimating(true);
 
         if (!animate) {
           individualProjectPage.hidden = true;
           individualProjectPage.classList.remove("active", "closing");
           projectCategoryPage.hidden = false;
           projectCategoryPage.classList.add("active");
-          projectCategoryPage.classList.remove("overview-exiting");
-          isAnimating = false;
+          projectCategoryPage.classList.remove("overview-exiting", "behind-detail");
+          setAnimating(false);
           return;
         }
 
+        // Snapshot current scroll — all measurements happen here so positions are consistent.
         const currentScrollY = window.scrollY;
         const scrollDelta = savedRowScrollY - currentScrollY;
 
-        // Measure individual title BEFORE showing category page (layout shift guard).
-        const indivStyles = getComputedStyle(individualTitle);
-        const indivFontSize = parseFloat(indivStyles.fontSize);
-        const indivRange = document.createRange();
-        indivRange.selectNodeContents(individualTitle);
-        const indivTextRect = indivRange.getBoundingClientRect();
+        // Measure individual title BEFORE showing the category page (layout shift would corrupt it).
+        const indStyles = getComputedStyle(individualTitle);
+        const indFontSize = parseFloat(indStyles.fontSize);
+        const indRange = document.createRange();
+        indRange.selectNodeContents(individualTitle);
+        const indTextRect = indRange.getBoundingClientRect();
 
-        // Show category page.
+        // Stop rows from replaying their entry animation on re-show — they must be
+        // stable and measurable for the reverse title animation to land correctly.
+        categoryProjectRows.classList.add("no-replay");
+
         projectCategoryPage.hidden = false;
-        projectCategoryPage.classList.remove("overview-exiting", "closing", "behind-detail");
         projectCategoryPage.classList.add("active");
+        projectCategoryPage.classList.remove("overview-exiting", "behind-detail");
 
-        // Measure row at currentScrollY with hover neutralized.
+        // Measure row positions at currentScrollY, then adjust by scrollDelta so they
+        // match where the row will be once scroll is restored to savedRowScrollY.
+        const rect = activeProjectRow ? activeProjectRow.getBoundingClientRect() : null;
+
+        // Force hover transform to neutral before measuring so cursor-over-row
+        // doesn't shift the target position by 4px.
         const rowTitleEl = activeProjectRow ? activeProjectRow.querySelector(".project-row-text h3") : null;
-        const rowRect = activeProjectRow ? activeProjectRow.getBoundingClientRect() : null;
         let rowTextRect = null;
         let rowFontSize = 0;
-        if (rowTitleEl && activeProjectRow) {
+        if (rowTitleEl) {
           activeProjectRow.style.transition = "none";
           activeProjectRow.style.transform = "translateY(0)";
-          void activeProjectRow.offsetHeight;
+          void activeProjectRow.offsetHeight; // force reflow
           const rowStyles = getComputedStyle(rowTitleEl);
           rowFontSize = parseFloat(rowStyles.fontSize);
           const rowRange = document.createRange();
@@ -1535,21 +1583,23 @@
           activeProjectRow.style.transition = "";
         }
 
+        // Spawn clone of the individual title before hiding the page.
+        let titleClone = null;
         if (rowTextRect) {
-          const titleClone = document.createElement("div");
+          titleClone = document.createElement("div");
           titleClone.textContent = individualTitle.textContent.trim();
           Object.assign(titleClone.style, {
             position: "fixed",
-            left: indivTextRect.left + "px",
-            top: indivTextRect.top + "px",
-            fontSize: indivFontSize + "px",
-            fontWeight: indivStyles.fontWeight,
-            fontFamily: indivStyles.fontFamily,
-            fontStyle: indivStyles.fontStyle,
-            fontStretch: indivStyles.fontStretch,
-            lineHeight: indivStyles.lineHeight,
-            letterSpacing: indivStyles.letterSpacing,
-            color: indivStyles.color,
+            left: indTextRect.left + "px",
+            top: indTextRect.top + "px",
+            fontSize: indFontSize + "px",
+            fontWeight: indStyles.fontWeight,
+            fontFamily: indStyles.fontFamily,
+            fontStyle: indStyles.fontStyle,
+            fontStretch: indStyles.fontStretch,
+            lineHeight: indStyles.lineHeight,
+            letterSpacing: indStyles.letterSpacing,
+            color: indStyles.color,
             whiteSpace: "nowrap",
             margin: "0",
             padding: "0",
@@ -1561,15 +1611,19 @@
           titleClone.style.setProperty("-moz-osx-font-smoothing", "grayscale");
           document.body.appendChild(titleClone);
 
+          // Measure ink overflow at indFontSize — large at this size, so correct
+          // at both ends of the animation.
           const cloneTestRange = document.createRange();
           cloneTestRange.selectNodeContents(titleClone);
           const cloneInkOffset = cloneTestRange.getBoundingClientRect().top - titleClone.getBoundingClientRect().top;
 
-          titleClone.style.top = (indivTextRect.top - cloneInkOffset) + "px";
+          // Shift element down so clone ink aligns with h2 ink at the start.
+          titleClone.style.top = (indTextRect.top - cloneInkOffset) + "px";
 
-          const revScale = indivFontSize > 0 ? rowFontSize / indivFontSize : 1;
-          const tx = rowTextRect.left - indivTextRect.left;
-          const tyBase = rowTextRect.top - indivTextRect.top + cloneInkOffset * (1 - revScale) - scrollDelta;
+          const revScale = indFontSize > 0 ? rowFontSize / indFontSize : 1;
+          const tx = rowTextRect.left - indTextRect.left;
+          // tyBase without hover bias — bias is applied in rAF after scroll takes effect.
+          const tyBase = rowTextRect.top - indTextRect.top + cloneInkOffset * (1 - revScale) - scrollDelta;
 
           individualTitle.style.opacity = "0";
 
@@ -1582,6 +1636,7 @@
           hero.style.borderRadius = "0px";
           document.body.appendChild(hero);
 
+          // Restore scroll now — hero covers the page so the jump is invisible.
           window.scrollTo({ top: savedRowScrollY, behavior: "auto" });
 
           individualProjectPage.hidden = true;
@@ -1589,15 +1644,17 @@
 
           requestAnimationFrame(() => {
             requestAnimationFrame(() => {
+              // Check hover after scroll has taken effect using elementFromPoint,
+              // since :hover state doesn't update until the next pointer event.
               const elemUnder = document.elementFromPoint(mouseX, mouseY);
               const rowHovered = activeProjectRow.contains(elemUnder) || activeProjectRow === elemUnder;
-              const ty = tyBase + (rowHovered ? -2 : -4);
+              const ty = tyBase + (rowHovered ? -4 : 0.5);
 
-              if (rowRect) {
-                hero.style.left = rowRect.left + "px";
-                hero.style.top = (rowRect.top - scrollDelta) + "px";
-                hero.style.width = rowRect.width + "px";
-                hero.style.height = rowRect.height + "px";
+              if (rect) {
+                hero.style.left = rect.left + "px";
+                hero.style.top = (rect.top - scrollDelta) + "px";
+                hero.style.width = rect.width + "px";
+                hero.style.height = rect.height + "px";
                 hero.style.borderRadius = "14px";
               }
               titleClone.style.transition = "transform 0.32s cubic-bezier(0.4, 0, 0.2, 1)";
@@ -1605,29 +1662,56 @@
             });
           });
 
+          // Keep the clone visible until the hero is fully faded, then remove both
+          // together — the real row title appears seamlessly with no blank or fade gap.
           setTimeout(() => {
             hero.classList.add("hero-fade-out");
-            titleClone.remove();
           }, 320);
 
           setTimeout(() => {
+            titleClone.remove();
             individualTitle.style.opacity = "";
             hero.remove();
-            isAnimating = false;
+            setAnimating(false);
           }, 680);
 
           return;
         }
 
-        // Fallback: no row reference.
-        individualProjectPage.classList.remove("active");
-        individualProjectPage.classList.add("closing");
-        jumpToProjectsTop();
+        // Fallback: no row reference, just animate hero.
+        const hero = document.createElement("div");
+        hero.id = "card-expand-hero";
+        hero.style.left = "0px";
+        hero.style.top = "0px";
+        hero.style.width = "100vw";
+        hero.style.height = "100vh";
+        hero.style.borderRadius = "0px";
+        document.body.appendChild(hero);
+
+        window.scrollTo({ top: savedRowScrollY, behavior: "auto" });
+
+        individualProjectPage.hidden = true;
+        individualProjectPage.classList.remove("active", "closing");
+
+        requestAnimationFrame(() => {
+          requestAnimationFrame(() => {
+            if (rect) {
+              hero.style.left = rect.left + "px";
+              hero.style.top = (rect.top - scrollDelta) + "px";
+              hero.style.width = rect.width + "px";
+              hero.style.height = rect.height + "px";
+              hero.style.borderRadius = "14px";
+            }
+          });
+        });
+
         setTimeout(() => {
-          individualProjectPage.hidden = true;
-          individualProjectPage.classList.remove("closing");
-          isAnimating = false;
-        }, 210);
+          hero.classList.add("hero-fade-out");
+          setTimeout(() => {
+            hero.remove();
+            setAnimating(false);
+          }, 560);
+        }, 280);
       }
 
       function resetProjectPages() {
@@ -1938,6 +2022,14 @@
     opacity: 0;
   }
 
+  /* While a page transition is running, cards and rows can't receive pointer
+     events — hovering mid-animation would lift the real title out from under
+     the flying title clone. Hover re-engages naturally once the lock lifts. */
+  body.hover-lock .project-category-card,
+  body.hover-lock .project-row {
+    pointer-events: none;
+  }
+
   .open-project-button {
     margin-top: 1.6rem;
     color: var(--accent);
@@ -2005,6 +2097,8 @@
 
   .project-row {
     width: 100%;
+    font-family: inherit; /* <button> defaults to the UA font (Arial), not the page font —
+                             this caused the title clone to snap typefaces at animation end */
     border: 1px solid rgba(var(--accent-rgb), 0.12);
     background:
       linear-gradient(135deg, rgba(var(--accent-rgb), 0.035), transparent 35%),
@@ -2059,6 +2153,20 @@
       linear-gradient(135deg, rgba(var(--accent-rgb), 0.07), transparent 38%),
       var(--bg-light);
     box-shadow: 0 0 32px rgba(var(--accent-rgb), 0.1);
+  }
+
+  /* When returning from an individual project, rows must not replay their
+     entry animation — they need to be stable so the reverse title animation
+     lands on the correct position. */
+  .project-row-list.no-replay .project-row {
+    animation: none;
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .project-row-list.no-replay .project-row:hover,
+  .project-row-list.no-replay .project-row.launching {
+    transform: translateY(-4px);
   }
 
   .project-row-main {
