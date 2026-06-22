@@ -29,9 +29,12 @@
     </header>
 
     <nav class="top-nav">
-      <button class="tab-button active" data-tab="education">Education</button>
-      <button class="tab-button" data-tab="projects">Projects</button>
-      <button class="tab-button" data-tab="experience">Experience</button>
+      <div class="tab-pill-group">
+        <span class="tab-pill-indicator" aria-hidden="true"></span>
+        <button class="tab-button active" data-tab="education">Education</button>
+        <button class="tab-button" data-tab="projects">Projects</button>
+        <button class="tab-button" data-tab="experience">Experience</button>
+      </div>
       <a
         class="nav-link"
         href="https://www.linkedin.com/"
@@ -45,7 +48,7 @@
     <main class="page">
       <section id="education" class="screen active">
         <p class="section-label">01 / Education</p>
-        <h2>Engineer in the making.</h2>
+        <h2>Engineer in the making — built to make real things.</h2>
 
         <div class="edu-stats">
           <div class="edu-stat">
@@ -351,6 +354,17 @@
 
       const projectsScreen = document.querySelector("#projects");
       const topNav = document.querySelector(".top-nav");
+
+      const pillGroup = document.querySelector(".tab-pill-group");
+      const pillIndicator = document.querySelector(".tab-pill-indicator");
+      function movePill() {
+        if (!pillGroup || !pillIndicator) return;
+        const activeBtn = pillGroup.querySelector(".tab-button.active");
+        if (!activeBtn) return;
+        pillIndicator.style.width = activeBtn.offsetWidth + "px";
+        pillIndicator.style.transform =
+          "translateX(" + activeBtn.offsetLeft + "px)";
+      }
 
       const projectCards = document.querySelectorAll(".project-category-card");
       const projectsOverview = document.querySelector("#projectsOverview");
@@ -1694,6 +1708,55 @@
       // restores its position. Experience always opens at the top.
       const tabScrollPositions = {};
 
+      // The scroll position a tab should land on. The nav is sticky (top: 0)
+      // and pins flush against the bottom of the (static) hero, so the hero's
+      // height is the "content top" — the natural top of any tab, under the
+      // pinned nav. Returning to document 0 would throw the reader back up into
+      // the hero splash, which is what made a switch feel like it snapped to the
+      // top. We read the hero height (stable) rather than topNav.offsetTop,
+      // because a stuck sticky element reports an unreliable offsetTop.
+      function computeTargetScroll(tabName) {
+        const heroHeader = document.querySelector(".hero");
+        const contentTop = heroHeader ? heroHeader.offsetHeight : 0;
+
+        // Experience always opens at the top of its content; every other tab
+        // restores where it was last left, falling back to the content top if
+        // never visited. Clamp to the content top so a switch never lands
+        // inside the hero, even if the tab was left scrolled up in it.
+        const saved = tabScrollPositions[tabName];
+        const restored =
+          tabName === "experience"
+            ? contentTop
+            : saved != null
+              ? saved
+              : contentTop;
+        return Math.max(contentTop, restored);
+      }
+
+      // Eased scroll driven by rAF so we get a reliable completion callback
+      // (native scroll-behavior: smooth has no cross-browser "done" event). The
+      // loop always runs for the full duration — even when the distance is ~0 —
+      // so the caller's onDone fires on a predictable schedule and the outgoing
+      // fade has time to play on a same-position switch.
+      let scrollAnimId = 0;
+      function smoothScrollTo(targetY, duration, onDone) {
+        cancelAnimationFrame(scrollAnimId);
+        const startY = window.scrollY;
+        const dist = targetY - startY;
+        const start = performance.now();
+        const ease = (t) => 1 - Math.pow(1 - t, 3); // easeOutCubic
+        const stepFn = (now) => {
+          const t = Math.min(1, (now - start) / duration);
+          window.scrollTo({ top: startY + dist * ease(t), behavior: "auto" });
+          if (t < 1) {
+            scrollAnimId = requestAnimationFrame(stepFn);
+          } else if (onDone) {
+            onDone();
+          }
+        };
+        scrollAnimId = requestAnimationFrame(stepFn);
+      }
+
       function showTab(tabName) {
         const currentScreen = document.querySelector(".screen.active");
         const nextScreen = document.getElementById(tabName);
@@ -1713,6 +1776,7 @@
         tabButtons.forEach((button) => {
           button.classList.toggle("active", button.dataset.tab === tabName);
         });
+        movePill();
 
         history.replaceState(null, "", `#${tabName}`);
 
@@ -1722,18 +1786,19 @@
           }
         };
 
-        const activateNext = () => {
+        const activateNext = (scrollBehavior) => {
           screens.forEach((screen) => {
             screen.classList.toggle("active", screen === nextScreen);
           });
 
-          // Experience always opens at the top; every other tab restores the
-          // scroll position it had when you last left it.
-          const targetScroll =
-            tabName === "experience"
-              ? 0
-              : tabScrollPositions[tabName] ?? 0;
-          window.scrollTo({ top: targetScroll, behavior: "auto" });
+          // By the time we get here on an animated switch we've already eased
+          // the (still-present) outgoing screen to this exact position, so this
+          // is a no-op that just guarantees the final resting place. On the
+          // instant paths (first paint, reduced motion) it does the real work.
+          window.scrollTo({
+            top: computeTargetScroll(tabName),
+            behavior: scrollBehavior || "auto",
+          });
 
           triggerCardSlideIn(nextScreen);
           revealNextIfNeeded();
@@ -1756,23 +1821,38 @@
           return;
         }
 
-        // Animate the current screen out, then swap to the next one. Guard
-        // against overlapping transitions from rapid clicking.
+        // Fade the current screen out while we ease the scroll to the new
+        // tab's resting position, then swap. Crucially the scroll happens
+        // BEFORE the swap, while the outgoing screen is still displayed and
+        // therefore still tall enough to scroll through. Doing it after the
+        // swap (when the shorter incoming screen is in place) is what forced a
+        // hard jump: the browser would clamp the old deep scroll to the new,
+        // shorter page. Guard against overlapping transitions from rapid
+        // clicking via tabTransitioning.
         tabTransitioning = true;
         currentScreen.classList.remove("active");
         currentScreen.classList.add("exiting");
 
-        const finishExit = () => {
-          currentScreen.removeEventListener("animationend", finishExit);
+        // Scale the glide with distance so short hops feel snappy and long
+        // ones (e.g. leaving a deeply scrolled timeline) still read as smooth.
+        // The floor matches the ~0.26s fade so a same-position switch still
+        // lets the outgoing screen fade out before the swap.
+        const target = computeTargetScroll(tabName);
+        const distance = Math.abs(target - window.scrollY);
+        const duration = Math.min(520, Math.max(260, distance * 0.6));
+
+        let swapped = false;
+        const finishSwap = () => {
+          if (swapped) return;
+          swapped = true;
           currentScreen.classList.remove("exiting");
-          activateNext();
+          activateNext("smooth");
         };
 
-        currentScreen.addEventListener("animationend", finishExit);
-        // Fallback in case animationend doesn't fire.
-        setTimeout(() => {
-          if (currentScreen.classList.contains("exiting")) finishExit();
-        }, 360);
+        smoothScrollTo(target, duration, finishSwap);
+        // Safety net in case rAF is starved (e.g. backgrounded tab) so the UI
+        // never gets stuck mid-transition.
+        setTimeout(finishSwap, duration + 250);
       }
 
       tabButtons.forEach((button) => {
@@ -1821,6 +1901,15 @@
         }
       }
 
+      // Position the sliding pill under the active tab on first paint, then
+      // keep it aligned as fonts settle and on resize.
+      movePill();
+      requestAnimationFrame(movePill);
+      if (document.fonts && document.fonts.ready) {
+        document.fonts.ready.then(movePill);
+      }
+      window.addEventListener("resize", movePill);
+
       // Run the staggered card slide-in on whichever screen loaded active.
       triggerCardSlideIn(document.getElementById(validStart));
       if (validStart === "education") setTimeout(animateCounters, 120);
@@ -1833,12 +1922,12 @@
         const dpr = Math.min(2, window.devicePixelRatio || 1);
         let w = 0, h = 0, pts = [];
         const mouse = { x: -9999, y: -9999 };
-        const REPEL = 140;
+        const REPEL = 110;
         function resize() {
           w = c.offsetWidth; h = c.offsetHeight;
           c.width = w * dpr; c.height = h * dpr;
           ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-          const n = Math.min(80, Math.round((w * h) / 16000));
+          const n = Math.min(160, Math.round((w * h) / 8000));
           pts = Array.from({ length: n }, () => ({
             x: Math.random() * w, y: Math.random() * h,
             vx: (Math.random() - 0.5) * 0.28, vy: (Math.random() - 0.5) * 0.28
@@ -1846,11 +1935,12 @@
         }
         resize();
         window.addEventListener("resize", resize);
-        c.addEventListener("mousemove", (e) => {
+        const moveTarget = c.parentElement || c;
+        moveTarget.addEventListener("mousemove", (e) => {
           const r = c.getBoundingClientRect();
           mouse.x = e.clientX - r.left; mouse.y = e.clientY - r.top;
         });
-        c.addEventListener("mouseleave", () => { mouse.x = -9999; mouse.y = -9999; });
+        moveTarget.addEventListener("mouseleave", () => { mouse.x = -9999; mouse.y = -9999; });
         (function loop() {
           ctx.clearRect(0, 0, w, h);
           for (const p of pts) {
@@ -1859,23 +1949,24 @@
             if (p.y < 0 || p.y > h) p.vy *= -1;
             const dx = p.x - mouse.x, dy = p.y - mouse.y, dm = Math.hypot(dx, dy) || 1;
             const near = dm < REPEL;
+            const prox = near ? (1 - dm / REPEL) : 0;
             if (near) {
-              const f = (1 - dm / REPEL) * 5;
+              const f = prox * 1.4;
               p.x += (dx / dm) * f; p.y += (dy / dm) * f;
               p.x = Math.max(0, Math.min(w, p.x)); p.y = Math.max(0, Math.min(h, p.y));
             }
             ctx.beginPath();
             ctx.arc(p.x, p.y, near ? 2.8 : 1.6, 0, Math.PI * 2);
-            ctx.fillStyle = near ? "rgba(41,182,255,.95)" : "rgba(120,140,160,.5)";
+            ctx.fillStyle = near ? `rgba(${150 - 109 * prox}, ${170 + 12 * prox}, ${190 + 65 * prox}, ${0.62 + 0.38 * prox})` : "rgba(150,170,190,.62)";
             ctx.fill();
           }
           for (let i = 0; i < pts.length; i++) {
             for (let j = i + 1; j < pts.length; j++) {
               const a = pts[i], b = pts[j];
               const d = Math.hypot(a.x - b.x, a.y - b.y);
-              if (d < 120) {
+              if (d < 100) {
                 ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y);
-                ctx.strokeStyle = "rgba(90,110,130," + (0.18 * (1 - d / 120)) + ")";
+                ctx.strokeStyle = `rgba(120,150,180,${0.42 * (1 - d / 100)})`;
                 ctx.lineWidth = 1; ctx.stroke();
               }
             }
@@ -1976,7 +2067,55 @@
     border-bottom: 1px solid rgba(var(--accent-rgb), 0.12);
   }
 
-  .tab-button,
+  /* Sliding-pill tab group */
+  .tab-pill-group {
+    position: relative;
+    display: flex;
+    align-items: center;
+    padding: 5px;
+    background: rgba(255, 255, 255, 0.025);
+    border: 1px solid rgba(136, 146, 176, 0.18);
+    border-radius: 11px;
+  }
+
+  .tab-pill-indicator {
+    position: absolute;
+    top: 5px;
+    bottom: 5px;
+    left: 0;
+    width: 0;
+    border-radius: 8px;
+    background: rgba(var(--accent-rgb), 0.14);
+    border: 1px solid rgba(var(--accent-rgb), 0.55);
+    box-shadow: 0 0 22px rgba(var(--accent-rgb), 0.22);
+    transform: translateX(0);
+    transition:
+      transform 0.5s cubic-bezier(0.34, 1.4, 0.5, 1),
+      width 0.5s cubic-bezier(0.34, 1.4, 0.5, 1);
+    pointer-events: none;
+  }
+
+  .tab-pill-group .tab-button {
+    position: relative;
+    z-index: 1;
+    color: var(--muted);
+    border: none;
+    background: none;
+    padding: 0.75rem 1.1rem;
+    font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
+    font-size: 0.92rem;
+    cursor: pointer;
+    transition: color 0.35s ease;
+  }
+
+  .tab-pill-group .tab-button:hover {
+    color: var(--white);
+  }
+
+  .tab-pill-group .tab-button.active {
+    color: var(--accent);
+  }
+
   .nav-link {
     color: var(--muted);
     text-decoration: none;
@@ -1994,16 +2133,10 @@
       transform 0.16s ease;
   }
 
-  .tab-button:hover,
-  .nav-link:hover,
-  .tab-button.active {
+  .nav-link:hover {
     color: var(--accent);
     border-color: var(--accent);
     background: rgba(var(--accent-rgb), 0.1);
-  }
-
-  .tab-button:hover,
-  .nav-link:hover {
     transform: translateY(-2px);
   }
 
@@ -2754,10 +2887,10 @@
       gap: 0.8rem;
     }
 
-    .tab-button,
+    .tab-pill-group .tab-button,
     .nav-link {
       white-space: nowrap;
-      padding: 0.75rem 1rem;
+      padding: 0.7rem 0.85rem;
       font-size: 0.85rem;
     }
 
