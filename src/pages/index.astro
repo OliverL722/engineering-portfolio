@@ -17,8 +17,8 @@ const LINKEDIN = 'https://www.linkedin.com/in/olesiakowski';
 const EMAIL = 'ololesiakowski@gmail.com';
 const PHONE = '(224) 501-1902';
 const PHONE_TEL = '+12245011902';
-// fill in your GitHub link; a link left as '' hides that button
-const GITHUB = 'https://github.com/';
+// a link left as '' hides that button
+const GITHUB = 'https://github.com/OliverL722';
 const GRADE_AUDIT = '/Grade_Audit_Lesiakowski.pdf'; // in /public (student ID and job ID blanked out)
 const SOCIALS = [
   { id: 'gh', label: 'GitHub', tip: 'GitHub', href: GITHUB, ext: true,
@@ -46,7 +46,6 @@ const FALLBACK = "if(this.dataset.full&&this.src.indexOf(this.dataset.full)<0){t
 
 /* ---------------- Education ---------------- */
 const GPA = 3.84;
-const GPA_PCT = ((GPA / 4) * 100).toFixed(0);
 const COURSE_URL = 'https://courses.illinois.edu/schedule/terms/';
 // colour groups for the coursework section (legend, chips and the credit bar)
 const GROUPS = [
@@ -97,20 +96,21 @@ const fmtHrs = (n) => (Number.isInteger(n) ? String(n) : n.toFixed(1));
 const termHrs = (t) => t.courses.reduce((n, c) => n + (c.hrs || 0), 0);
 const termNote = (t) => t.note || (t.status === 'now' ? 'In progress' : t.status === 'planned' ? 'Remaining' : 'Completed');
 const STATUS_LABEL = { now: 'In progress', planned: 'Remaining', credit: 'Credit' };
-// credit hours by colour group (taken + in progress), for the stacked bar
-const GROUP_HRS = Object.fromEntries(GROUPS.map((g) => [g.key, 0]));
-TERMS.filter((t) => t.status !== 'planned').forEach((t) => t.courses.forEach((c) => { GROUP_HRS[c.grp] += c.hrs || 0; }));
-const BAR_TOTAL = Object.values(GROUP_HRS).reduce((a, b) => a + b, 0);
+// Coursework timeline: semesters oldest → newest; the in-progress one is open first
+const TIMELINE = TERMS.filter((t) => t.status !== 'planned').reverse();
+const TL_NOW = TIMELINE.findIndex((t) => t.status === 'now');
+const TL_START = TL_NOW >= 0 ? TL_NOW : TIMELINE.length - 1;
+const tlLabel = (t) => t.term.replace(/ credit$/, '');
 
 // degree audit PDF (in /public, student ID and job ID blanked out)
 const AUDIT = { url: '/Grade_Audit_Lesiakowski.pdf' };
 
 const ORGS = [
   { name: 'ASME NovoPrint', sub: 'Hotend co-lead · robotic-arm 3D printer', src: '/photos/asme.jpg', label: 'Photo — ASME team' },
-  { name: 'Combustion Diagnostics Lab', sub: 'Undergrad research assistant', src: '/photos/combustion-lab.webp', label: 'Photo — Combustion lab', alt: 'Inside the off-campus combustion research site' },
+  { name: 'Combustion Diagnostics Lab', sub: 'Undergrad research assistant', src: '/photos/combustion-lab.webp', label: 'Photo — Combustion lab', alt: 'Inside the off-campus combustion research site I worked at' },
 ];
 const CAMPUS = [
-  { src: '/photos/campus-1.webp', label: 'Campus photo 1', alt: 'Bike parked on the quad at night' },
+  { src: '/photos/campus-1.webp', label: 'Campus photo 1', alt: 'My bike on the North Quad at night' },
   { src: '/photos/campus-2.jpg', label: 'Campus photo 2' },
   { src: '/photos/campus-3.jpg', label: 'Campus photo 3' },
 ];
@@ -134,8 +134,8 @@ const EXP_RAW = [
     tools: ['Creo Parametric', 'Drop & puncture testing', 'Maccor cycling', 'CT & X-ray', 'Optical microscopy', 'Elemental analysis'],
     bullets: ['Designed a drop-test fixture in Creo Parametric for prismatic and cylindrical cell impact testing, rapid-prototyping and validating it before presenting the design direction to the cell engineering team.', 'Executed drop, puncture, and cycling validation tests on prismatic lithium-ion cells, programming Maccor test profiles and analyzing impedance, voltage, capacity, temperature, and swell data.', 'Performed failure analysis on field-returned assemblies through teardown, CT scanning with 3D reconstruction, X-ray, optical microscopy, and elemental analysis, documenting findings in engineering reports.', 'Verified cable and electronics assemblies against build documents and disassembled cells for a material recovery study.'],
     photos: [
-      { src: '/photos/motorola-1.webp', alt: 'Oliver with Motorola Solutions colleagues' },
-      { src: '/photos/motorola-2.webp', alt: 'Motorola Solutions office building' },
+      { src: '/photos/motorola-1.webp', alt: 'Me with my bosses, Andy and Dan, at Motorola Solutions' },
+      { src: '/photos/motorola-2.webp', alt: 'The Motorola Solutions office in Schaumburg' },
     ] },
   { title: 'UIUC Combustion Diagnostics Lab', role: 'Mechanical Engineering Research Assistant', start: '2026-01', end: '2026-05', where: 'Champaign–Urbana, IL', current: false,
     logo: '/logos/uiuc.png',
@@ -143,11 +143,11 @@ const EXP_RAW = [
     tools: ['Fusion 360', '3D printing', 'Aluminum assemblies'],
     bullets: ['Designed and fabricated utility fixtures for UIUC’s off-campus combustion research facility, modeling in Fusion 360 and building 3D-printed mounts and aluminum assemblies for HVAC, electrical, and laboratory instruments.', 'Gathered researcher requirements and set the design direction for fixtures that improved lab efficiency.'],
     photos: [
-      { src: '/photos/uiuc-lab-1.webp', alt: 'Organized storage container at the research site' },
-      { src: '/photos/uiuc-lab-2.webp', alt: 'Shelving installed inside the silo' },
-      { src: '/photos/uiuc-lab-3.webp', alt: 'Cabinet and shelving inside the storage container' },
-      { src: '/photos/uiuc-lab-4.webp', alt: 'Wall-mounted rail inside the silo' },
-      { src: '/photos/uiuc-lab-5.webp', alt: 'Gas cylinders and equipment racks in the silo' },
+      { src: '/photos/uiuc-lab-1.webp', alt: 'The storage container I organized at the research site' },
+      { src: '/photos/uiuc-lab-2.webp', alt: 'Shelving I put up inside the silo' },
+      { src: '/photos/uiuc-lab-3.webp', alt: 'Cabinet and shelving I set up in the container' },
+      { src: '/photos/uiuc-lab-4.webp', alt: 'A wall-mounted rail I installed in the silo' },
+      { src: '/photos/uiuc-lab-5.webp', alt: 'Gas cylinders and equipment racks in the silo lab' },
     ] },
   { title: 'Tiptek, LLC', role: 'Laboratory Technician', start: '2025-10', end: '2026-01', where: 'Savoy, IL', current: false,
     logo: '/logos/tiptek.png',
@@ -194,7 +194,7 @@ const shot = (name, caption, cad = false) => ({ src: P + name + '.webp', caption
 const FEATURED_ON_ALL = 'done'; // which category's featured project shows under "All"
 const PROJECT_CATS = [
   { key: 'done', label: 'Completed', title: 'Completed Projects', kicker: 'COMPLETED', projects: [
-    { title: '3D Printed Electric Guitar', time: 'Summer 2025', image: 'Finished guitar image', src: P + 'guitar.webp', featured: true,
+    { title: '3D Printed Electric Guitar', time: 'Summer 2025', image: 'Finished guitar image', src: P + 'guitar-hero.webp', featured: true,
       description: 'FDM-printed electric guitar body with integrated cavities and a resin-finished exterior.',
       bullets: ['Modeled the guitar body with cavities for pickups, wiring, and controls.', 'Iterated geometry and print orientation for rigidity and component fit.', 'Used resin finishing to improve durability and appearance.'],
       sections: [
@@ -203,14 +203,15 @@ const PROJECT_CATS = [
         { label: 'Fabrication', title: 'Print & finish', image: 'Print process', src: P + 'guitar-print.webp',
           bullets: ['Printed sections joined, with the seams filled and sanded flush.', 'Primed and painted black, then finished with a pearl swirl resin coat.', 'Pickups, wiring, and controls installed into the finished body.'] } ],
       gallery: [
-        shot('guitar-cad', 'CAD model of the body', true),
-        shot('guitar-print', 'Printed sections joined, seams filled'),
-        shot('guitar-paint', 'Base coat'),
-        shot('guitar-black', 'Painted black'),
-        shot('guitar-resin', 'Pearl swirl finish curing'),
-        shot('guitar-finish', 'Finished body'),
-        shot('guitar-wiring', 'Wiring the pickups and controls'),
-        shot('guitar-detail', 'Hardware detail'),
+        shot('guitar-done', 'My finished guitar, plugged in and playing'),
+        shot('guitar-cad', 'My CAD model of the body', true),
+        shot('guitar-print', 'My printed sections, joined and seams filled'),
+        shot('guitar-paint', 'Laying down the base coat'),
+        shot('guitar-black', 'The body after its black coat'),
+        shot('guitar-resin', 'My pearl swirl resin finish curing'),
+        shot('guitar-finish', 'The finished body'),
+        shot('guitar-wiring', 'Me wiring the pickups and controls'),
+        shot('guitar-detail', 'A close-up of the hardware'),
       ] },
     { title: 'Research Site Storage Build-Out', time: 'Spring 2026', image: 'Storage container image', src: P + 'storage.webp',
       description: 'Shelving and storage installations in a shipping container and a silo at an off-campus university research site.',
@@ -221,26 +222,26 @@ const PROJECT_CATS = [
         { label: 'Silo', title: 'Silo lab space', image: 'Silo', src: P + 'silo-shelving.webp',
           bullets: ['Shelving installed for tools and supplies.', 'Wall-mounted storage to keep the floor clear.', 'Organized around the lab’s instruments, gas, and HVAC runs.'] } ],
       gallery: [
-        shot('storage', 'Storage container, after the build-out'),
-        shot('storage-open', 'Container, doors open'),
-        shot('storage-cleanout', 'Clean-out'),
-        shot('storage-shelves', 'Shelving along the container wall'),
-        shot('storage-scaffold', 'Racking'),
-        shot('storage-scaffold-2', 'Racking and cabinet'),
-        shot('storage-corner', 'Cabinet and racking'),
-        shot('storage-cabinet', 'Cabinet storage'),
-        shot('storage-cabinet-2', 'Cabinet storage'),
-        shot('storage-back', 'Back of the container'),
-        shot('storage-back-2', 'Back of the container'),
-        shot('storage-heater', 'Equipment storage'),
-        shot('silo-shelving', 'Shelving inside the silo'),
-        shot('silo-rail', 'Wall-mounted rail'),
-        shot('silo-bay', 'Silo work bay'),
-        shot('silo-bench', 'Silo bench area'),
-        shot('silo-entry', 'Silo interior'),
-        shot('silo-room', 'Silo interior'),
-        shot('silo-gas', 'Gas cylinders and racks'),
-        shot('silo-duct', 'Equipment area'),
+        shot('storage', 'The storage container after my build-out'),
+        shot('storage-open', 'The container with its doors open'),
+        shot('storage-cleanout', 'Everything I hauled out during the clean-out'),
+        shot('storage-shelves', 'Shelving I lined up along the container wall'),
+        shot('storage-scaffold', 'Racking I set up in the container'),
+        shot('storage-scaffold-2', 'Racking next to the cabinet'),
+        shot('storage-corner', 'The cabinet and racking side by side'),
+        shot('storage-cabinet', 'The cabinet, stocked and labeled'),
+        shot('storage-cabinet-2', 'Another look at the cabinet'),
+        shot('storage-back', 'The back of the container'),
+        shot('storage-back-2', 'More of the back wall'),
+        shot('storage-heater', 'Where the bigger equipment lives'),
+        shot('silo-shelving', 'Shelving I put up inside the silo'),
+        shot('silo-rail', 'A wall-mounted rail I installed'),
+        shot('silo-bay', 'The silo work bay'),
+        shot('silo-bench', 'The silo bench area'),
+        shot('silo-entry', 'Inside the silo'),
+        shot('silo-room', 'Another corner of the silo'),
+        shot('silo-gas', 'Gas cylinders and racks in the silo lab'),
+        shot('silo-duct', 'The silo equipment area'),
       ] },
     { title: 'DeckStep™ Shoe Rack', time: 'Fall 2025', image: 'Finished product image', src: P + 'deckstep.jpg',
       description: 'Repurposed skateboard deck converted into a shoe rack using custom 3D-printed supports.',
@@ -254,7 +255,7 @@ const PROJECT_CATS = [
       sections: [
         { label: 'Powertrain', title: 'Electrical upgrades', image: 'Battery wiring', src: P + 'ride-on-2.webp', bullets: ['Add battery layout photo.', 'Add controller/wiring photo.', 'List voltage, range, or performance changes.'] },
         { label: 'Testing', title: 'Performance results', image: 'Test photo', bullets: ['Add final vehicle photo.', 'Add short testing notes.', 'Mention what failed or was redesigned.'] } ],
-      gallery: [shot('ride-on', 'Brushless motor and 35A ESC'), shot('ride-on-2', 'Bench wiring')] },
+      gallery: [shot('ride-on', 'My brushless motor and 35A ESC install'), shot('ride-on-2', 'Wiring it up on the bench')] },
   ] },
   { key: 'model', label: '3D Models', title: '3D Models', kicker: '3D MODEL', projects: [
     { title: 'Folding Numpad', time: 'Spring 2025', image: 'Numpad render', src: P + 'numpad.webp', cad: true, featured: true,
@@ -334,6 +335,7 @@ const ABOUT = {
     'Right now I’m a mechanical engineering intern at Tiptek, designing automation and handling hardware for semiconductor nanoprobes. This past summer I was on Motorola Solutions’ battery cell team, testing and tearing down lithium-ion cells. Long term, I want to be a mechanical design engineer working on consumer tech.',
     'I grew up in Palatine, Illinois, where I spent three years at the local hardware store before any of this. When I’m not at a desk, I’m usually taking something apart or building something new.',
   ],
+  photo: { src: '/photos/oliver.webp', caption: 'Me on the Chicago River at the Motorola boat outing' },
   facts: [
     { label: 'Studying', value: 'ME + CS minor, UIUC' },
     { label: 'Now', value: 'ME Intern, Tiptek' },
@@ -347,13 +349,13 @@ const ABOUT = {
    A hobby with no photos shows a placeholder until you add some. */
 const HOBBIES = [
   { title: 'Device teardowns', blurb: 'Laptops and phones, opened up to see how they’re packed.',
-    photos: [shot('teardown-laptop', 'Laptop with its 90 Wh battery exposed'), shot('teardown-asus', 'ASUS laptop internals'), shot('teardown-lenovo', 'Lenovo laptop internals'), shot('teardown-iphone', 'iPhone opened up')] },
+    photos: [shot('teardown-laptop', 'A laptop I opened up, 90 Wh battery exposed'), shot('teardown-asus', 'Inside an ASUS laptop I took apart'), shot('teardown-lenovo', 'Inside a Lenovo laptop I took apart'), shot('teardown-iphone', 'An iPhone I opened up')] },
   { title: 'PC building', blurb: 'From a full tower to a compact small-form-factor build.',
-    photos: [shot('pc-sff', 'Compact build'), shot('pc-2020', 'Full tower build')] },
-  { title: 'Rubik’s cubes', blurb: '', photos: [] },
-  { title: 'Yo-yos', blurb: '', photos: [] },
-  { title: 'Mountain biking', blurb: '', photos: [] },
-  { title: 'Badminton', blurb: '', photos: [] },
+    photos: [shot('pc-sff', 'My compact PC build'), shot('pc-2020', 'My first build, a full tower')] },
+  { title: 'Rubik’s cubes', blurb: 'A growing collection, from pyraminx to megaminx.',
+    photos: [shot('cubes', 'My cube tower: pyraminx, 3x3, 4x4, megaminx and 5x5')] },
+  { title: 'Mountain biking', blurb: 'Riding, and keeping my Specialized FSR running myself.',
+    photos: [shot('bike-derailleur', 'Me fixing the derailleur on my Specialized FSR')] },
 ];
 
 // derived — no need to edit below
@@ -368,6 +370,66 @@ const CAT = Object.fromEntries(CATS.map((c) => [c.key, c]));
 const TOTAL = CATS.reduce((n, c) => n + c.projects.length, 0);
 const featuredOf = (c) => c.projects.find((p) => p.featured) || c.projects[0];
 const ALL_PROJECTS = CATS.flatMap((c) => c.projects.map((p) => ({ ...p, cat: c })));
+
+/* ---------------- Skills (Education page) ----------------
+   Four areas in a 2×2 grid. Clicking one flies it to the centre of the screen with its tools.
+   Each tool lists where it was used:
+     job(title, roleWord, text) → opens that job on Experience (uses its logo)
+     proj(title, text)          → opens that project page (title must match a project above)
+     crs(code, text)            → opens the course page */
+const expAt = (title, role) => EXP.findIndex((e) => e.title === title && (!role || e.role.includes(role)));
+const job = (title, role, what) => {
+  const i = expAt(title, role);
+  return { type: 'Job', where: title, what, logo: i >= 0 ? EXP[i].logo : undefined, href: '#experience', exp: i >= 0 ? i : undefined };
+};
+const proj = (title, what) => {
+  const p = ALL_PROJECTS.find((x) => x.title === title);
+  return { type: 'Project', where: title, what, href: p ? `#projects/${p.key}` : '#projects' };
+};
+const crs = (code, what) => ({ type: 'Course', where: code, what, href: COURSE_URL + code.replace(' ', '/'), ext: true });
+const MOTO = 'Motorola Solutions', TIP = 'Tiptek, LLC', LAB = 'UIUC Combustion Diagnostics Lab';
+const SKILLS = [
+  { key: 'cad', name: 'CAD',
+    icon: '<path d="M12 2.8 20.5 7.5v9L12 21.2 3.5 16.5v-9z"/><path d="M3.5 7.5 12 12.2l8.5-4.7M12 12.2v9"/>',
+    tools: [
+      { name: 'Creo Parametric', blurb: 'Parametric part and assembly modeling, mostly for test fixtures that have to hold real hardware.',
+        ev: [job(MOTO, '', 'Drop-test fixture for prismatic and cylindrical cell impact testing'), proj('Creo Design Studies', 'Constraint-driven part modeling and design tradeoffs')] },
+      { name: 'Fusion 360', blurb: 'Mechanism design, mounts and fixtures, modeled for 3D printing and machining.',
+        ev: [job(TIP, 'Intern', 'Automated alignment and insertion mechanism for nanoprobe production'), job(LAB, '', 'Mounts and aluminum assemblies for HVAC, electrical and lab instruments'), proj('Research Fixture Models', 'Instrument mounting fixtures for the research site')] },
+      { name: 'Design for manufacturability', blurb: 'Designing parts around how they will actually be made: draft, gates, print orientation.',
+        ev: [crs('TAM 270', 'Design for Manufacturability'), proj('Injection-Molded Snoopy', 'Part, sprue, runner and gate layout for molding')] },
+    ] },
+  { key: 'fab', name: 'Fabrication',
+    icon: '<path d="M4 20h16M6 16h12M8 12h8"/><path d="M10 3.5h4l-1 4.5h-2z"/>',
+    tools: [
+      { name: '3D printing', blurb: 'FDM printing for jigs, mounts and full parts, iterated for fit and strength.',
+        ev: [job(TIP, 'Intern', 'Test jigs iterated to reduce tip damage during handling'), job(LAB, '', '3D-printed mounts for lab instruments'), proj('3D Printed Electric Guitar', 'Body printed in sections, seams filled, resin finished'), proj('DeckStep™ Shoe Rack', 'Supports designed around skateboard truck geometry')] },
+      { name: 'Rapid prototyping', blurb: 'Quick print, test and revise loops before committing to a design.',
+        ev: [job(MOTO, '', 'Prototyped and validated the drop-test fixture before presenting it'), job(TIP, 'Intern', 'Iterating handling jigs to cut probe failure rates')] },
+      { name: 'Aluminum assemblies', blurb: 'Built and installed hardware for a working off-campus research site.',
+        ev: [job(LAB, '', 'Aluminum assemblies for instruments and utilities'), proj('Research Site Storage Build-Out', 'Shelving, racks and wall-mounted storage in a container and silo')] },
+    ] },
+  { key: 'test', name: 'Test and analysis',
+    icon: '<rect x="3" y="7" width="16" height="10" rx="2"/><path d="M21 10.5v3M7 10v4M10.5 10v4"/>',
+    tools: [
+      { name: 'Drop and puncture testing', blurb: 'Abuse validation on prismatic lithium-ion cells, from fixture setup to the data.',
+        ev: [job(MOTO, '', 'Drop and puncture validation tests on prismatic cells')] },
+      { name: 'Maccor cycling', blurb: 'Programming cycling profiles and reading what comes back: impedance, voltage, capacity, temperature and swell.',
+        ev: [job(MOTO, '', 'Programmed Maccor test profiles and analyzed cycling data')] },
+      { name: 'Failure analysis', blurb: 'Teardown, CT with 3D reconstruction, X-ray, optical microscopy and elemental analysis.',
+        ev: [job(MOTO, '', 'Field-returned assemblies, documented in engineering reports'), job(TIP, 'Technician', 'Optical and digital inspection of tip radius at sub-10 nm scale')] },
+    ] },
+  { key: 'soft', name: 'Software',
+    icon: '<path d="M8 8l-4 4 4 4M16 8l4 4-4 4M13.5 5l-3 14"/>',
+    tools: [
+      { name: 'C++', blurb: 'Templates, iterators, linked structures and file I/O, built and debugged from the command line.',
+        ev: [crs('CS 128', 'Introduction to Computer Science II'), proj('C++ Coursework Projects', 'Iterator-based functions and data structure operations')] },
+      { name: 'C# and Unity', blurb: '2D game scenes, animated transitions and C# scripting.',
+        ev: [proj('Bogemon Game', 'Intro sequence and battle-style scene flow')] },
+      { name: 'Astro and JavaScript', blurb: 'This site: Astro, custom CSS and JavaScript, deployed on GitHub Pages.',
+        ev: [proj('Portfolio Website', 'Animated sections, project pages, light and dark themes')] },
+    ] },
+];
 
 // rows for the little code monitor (rendered twice so the scroll loops seamlessly)
 const CODE_ROWS = [
@@ -388,7 +450,10 @@ const CODE_ROWS = [
     <title>Oliver Lesiakowski | Engineering Portfolio</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700;800;900&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet" />
+    <link rel="icon" href="/favicon.ico?v=ol" sizes="32x32" />
+    <link rel="icon" href="/favicon.svg?v=ol" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png?v=ol" />
+    <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
     <!-- before first paint: light by default on every visit (a dark pick lasts for this tab only) + the intro only when landing on Home -->
     <script is:inline>
       (function () {
@@ -449,7 +514,7 @@ const CODE_ROWS = [
       a{color:var(--acct)}
       button{font:inherit;color:inherit;letter-spacing:inherit}
       img{display:block}
-      .mono{font-family:'IBM Plex Mono',ui-monospace,monospace}
+      .mono{font-family:inherit;font-weight:600;font-variant-numeric:tabular-nums}
       :focus-visible{outline:2px solid var(--accg);outline-offset:3px}
       .theme-swap *,.theme-swap *::before,.theme-swap *::after{transition:none !important}
 
@@ -503,7 +568,7 @@ const CODE_ROWS = [
       .btn-ghost:hover{border-color:var(--line3);background:var(--surf2)}
 
       /* photo slot: label shows until a real image loads over it */
-      .ph{position:relative;display:flex;align-items:center;justify-content:center;padding:0 16px;background:var(--ph);overflow:hidden;font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:11.5px;color:var(--t3);text-align:center}
+      .ph{position:relative;display:flex;align-items:center;justify-content:center;padding:0 16px;background:var(--ph);overflow:hidden;font-size:11.5px;color:var(--t3);text-align:center}
       .ph img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
       .ph-dash{border:1px dashed var(--line3)}
       .ph-dash:has(img){border-style:solid;border-color:var(--line)}
@@ -545,7 +610,12 @@ const CODE_ROWS = [
       /* ================= ABOUT ================= */
       .about{position:relative;border-top:1px solid var(--line);background:var(--surf)}
       .about-in{max-width:1200px;margin:0 auto;padding:110px 24px 110px}
-      .about-grid{max-width:760px}
+      .about-grid{display:grid;grid-template-columns:minmax(0,.8fr) minmax(0,1.2fr);gap:clamp(36px,5vw,72px);align-items:center}
+      .about-me{margin:0}
+      .about-photo{position:relative;aspect-ratio:4/5;border-radius:28px;overflow:hidden;border:1px solid var(--line);box-shadow:var(--shadowL);transition:transform .5s cubic-bezier(.2,.7,.2,1),box-shadow .4s ease}
+      .about-photo img{object-position:50% 30%;transition:transform .8s cubic-bezier(.2,.7,.2,1)}
+      .about-photo:hover{box-shadow:var(--shadowH)}
+      .about-photo:hover img{transform:scale(1.03)}
       .about-txt .kick{margin:0 0 12px;font-size:12px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--acct)}
       .about-title{margin:0 0 22px;font-size:clamp(40px,5vw,64px);font-weight:800;letter-spacing:-.045em;line-height:1}
       .about-p{margin:0 0 16px;max-width:58ch;font-size:17px;line-height:1.65;color:var(--t2);text-wrap:pretty}
@@ -581,67 +651,111 @@ const CODE_ROWS = [
       html:not(.intro) .hx-wipe,html:not(.intro) .hx-spot{animation-duration:.9s}
 
       /* ================= EDUCATION ================= */
-      .edu-top{display:flex;flex-wrap:wrap;gap:16px}
       /* Education reads in the body face, no mono */
-      .page-edu .mono{font-family:inherit}
       .page-edu .kick{margin:0;font-size:12px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--t3)}
-      .school{flex:2 1 520px;min-width:0;padding:30px 34px}
-      .school-top{display:flex;align-items:center;gap:14px;margin-bottom:16px}
-      .school-logo{height:52px;min-width:52px;padding:8px 12px;border-radius:14px;box-shadow:none}
-      .school-name{margin:0;font-size:clamp(28px,3vw,40px);font-weight:800;letter-spacing:-.035em;line-height:1.05;text-wrap:balance}
-      .degree{margin:14px 0 0;font-size:17px;font-weight:500;color:var(--t2)}
-      .pills{display:flex;flex-wrap:wrap;gap:8px;margin-top:20px}
-      .pill{padding:8px 14px;border-radius:999px;background:var(--surf2);font-size:14px;color:var(--ink)}
-      .pill-acc{background:var(--tint);color:var(--acct2)}
-      .gpa{flex:1 1 280px;min-width:0;display:flex;flex-direction:column;justify-content:space-between;gap:18px;padding:30px 30px}
-      .gpa-row{display:flex;align-items:baseline;gap:8px}
-      .gpa-num{font-size:76px;font-weight:800;letter-spacing:-.05em;line-height:.9;color:var(--acct)}
-      .gpa-of{font-size:14px;color:var(--t3)}
-      .meter{height:6px;margin-top:18px;border-radius:3px;background:var(--track);overflow:hidden}
-      .meter i{display:block;height:100%;border-radius:3px;background:var(--acc);box-shadow:var(--glow);transform-origin:left center;animation:eMeter 1.4s cubic-bezier(.65,0,.35,1) .6s backwards}
       .block{margin-top:56px}
       .block-head{display:flex;justify-content:space-between;align-items:baseline;gap:12px;margin-bottom:16px}
       .block-title{margin-bottom:16px}
-
-      /* ---- coursework ---- */
       .g-me{--c:var(--g-me)}.g-math{--c:var(--g-math)}.g-cs{--c:var(--g-cs)}.g-eng{--c:var(--g-eng)}.g-sci{--c:var(--g-sci)}.g-gen{--c:var(--g-gen)}
-      .cw-head{align-items:flex-end;flex-wrap:wrap;margin-bottom:20px}
-      .cw-sub{margin:6px 0 0;font-size:14.5px;color:var(--t3)}
       .audit-btn{gap:8px}
       .audit-btn:hover{border-color:var(--accg);color:var(--acct2)}
-      .cw-legend{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:22px}
-      .lg{display:inline-flex;align-items:center;gap:8px;min-height:40px;padding:0 14px;border-radius:999px;border:1px solid var(--line2);background:var(--surf);font-size:14px;font-weight:600;color:var(--ink);cursor:pointer;transition:border-color .2s ease,background .2s ease,color .2s ease,transform .2s ease}
-      .lg i{width:10px;height:10px;border-radius:50%;background:var(--c)}
-      .lg-n{font-weight:500;color:var(--t3);font-variant-numeric:tabular-nums}
-      .lg:hover{transform:translateY(-1px);border-color:var(--c)}
-      .lg[aria-pressed=true]{border-color:var(--c);background:color-mix(in srgb,var(--c) 14%,var(--surf))}
-      /* semester cards */
-      .tgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(340px,100%),1fr));gap:16px}
-      .tcard{display:flex;flex-direction:column;gap:12px;min-width:0;padding:20px 16px 14px;border-radius:24px;border:1px solid var(--line);background:var(--surf);box-shadow:var(--shadow)}
-      .tcard.is-now{border-color:rgba(232,80,31,.45);box-shadow:var(--shadow),0 0 0 4px var(--tint)}
-      .tcard.is-planned{grid-column:1/-1;background:transparent;border-style:dashed;border-color:var(--line3);box-shadow:none}
-      .is-planned .crs-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(300px,100%),1fr));gap:2px 16px}
-      .tc-head{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;padding:0 6px}
-      .tc-title{display:flex;flex-direction:column;gap:5px;min-width:0}
-      .tc-title h4{margin:0;font-size:19px;font-weight:800;letter-spacing:-.02em}
-      .tc-status{display:inline-flex;align-items:center;gap:6px;font-size:13px;color:var(--t3)}
-      .tc-status.st-now{color:var(--green);font-weight:600}
-      .tc-status.st-now i{width:7px;height:7px;border-radius:50%;background:var(--greendot);animation:mPulse 2.2s ease-in-out infinite}
-      .tc-status.st-planned{color:var(--acct)}
-      .tc-hrs{flex:none;padding:4px 10px;border-radius:999px;background:var(--surf2);font-size:12.5px;font-weight:600;color:var(--t2);font-variant-numeric:tabular-nums}
-      .crs-list{display:flex;flex-direction:column;gap:2px;margin:0;padding:0;list-style:none}
-      .crs-list li{transition:opacity .3s ease,filter .3s ease}
-      .crs{display:grid;grid-template-columns:86px minmax(0,1fr) auto;align-items:center;gap:12px;padding:8px 6px;border-radius:12px;color:var(--ink);text-decoration:none;transition:background .2s ease}
-      a.crs:hover{background:color-mix(in srgb,var(--c) 10%,transparent)}
-      .crs-code{justify-self:start;padding:4px 9px;border-radius:8px;background:color-mix(in srgb,var(--c) 14%,transparent);color:var(--c);font-size:12.5px;font-weight:700;letter-spacing:.01em;white-space:nowrap;font-variant-numeric:tabular-nums}
-      .crs-name{font-size:14.5px;line-height:1.35;min-width:0}
-      .crs-hrs{font-size:12.5px;color:var(--t3);font-variant-numeric:tabular-nums}
-      .is-planned .crs-code{background:transparent;box-shadow:inset 0 0 0 1.5px color-mix(in srgb,var(--c) 55%,transparent)}
-      .is-planned .crs-name{color:var(--t2)}
-      .crs-req .crs-code{color:transparent;position:relative}
-      .crs-req .crs-code::after{content:'';position:absolute;left:50%;top:50%;width:6px;height:6px;margin:-3px 0 0 -3px;border-radius:50%;background:var(--c)}
-      /* filter: everything outside the picked area fades back */
-      .tgrid[data-f] .crs-list li:not(.on){opacity:.22;filter:grayscale(1)}
+
+      /* degree banner */
+      .edu-banner{display:flex;flex-wrap:wrap;align-items:center;gap:24px;padding:24px 28px}
+      .edu-logo{height:104px;min-width:104px;padding:14px 18px;border-radius:24px;box-shadow:none}
+      .edu-id{flex:999 1 320px;min-width:0;display:flex;flex-direction:column;gap:6px}
+      .edu-name{margin:0;font-size:clamp(24px,2.6vw,30px);font-weight:800;letter-spacing:-.03em;line-height:1.1;text-wrap:balance}
+      .edu-deg{margin:0;font-size:16px;font-weight:500;color:var(--t2)}
+      .edu-stats{flex:1 1 auto;display:flex;flex-wrap:wrap;margin:0}
+      .es{display:flex;flex-direction:column-reverse;gap:4px;padding:4px 22px}
+      .es+.es{border-left:1px solid var(--line)}
+      .es-num{margin:0;font-size:28px;font-weight:800;letter-spacing:-.03em;line-height:1.1;font-variant-numeric:tabular-nums}
+      .es-acc{color:var(--acct)}
+      .es-lbl{font-size:12.5px;color:var(--t3)}
+
+      /* coursework timeline: semester dots, then that semester's classes as bubbles */
+      .ct{padding:22px 26px 28px}
+      .ct-scroll{overflow-x:auto;padding-bottom:4px;scrollbar-width:none}
+      .ct-scroll::-webkit-scrollbar{display:none}
+      .ct-line{position:relative;display:flex;justify-content:space-between;min-width:720px}
+      .ct-rail{position:absolute;left:52px;right:52px;top:21px;height:2px;border-radius:1px;background:var(--line2)}
+      .ct-node{position:relative;display:flex;flex-direction:column;align-items:center;gap:8px;width:104px;padding:12px 0 6px;border:0;background:none;cursor:pointer}
+      .ct-dot{position:relative;z-index:1;width:18px;height:18px;border-radius:50%;border:2px solid var(--dotoff);background:var(--surf);transition:background .25s ease,border-color .25s ease,box-shadow .25s ease,transform .3s cubic-bezier(.34,1.56,.5,1)}
+      .ct-node.is-now .ct-dot{border-color:var(--greendot)}
+      .ct-node:hover .ct-dot{transform:scale(1.2)}
+      .ct-node[aria-pressed=true] .ct-dot{background:var(--acc);border:3px solid var(--surf);box-shadow:0 0 0 2px var(--accg),var(--glow)}
+      .ct-lbl{font-size:14px;font-weight:700;white-space:nowrap;transition:color .25s ease}
+      .ct-node:hover .ct-lbl{color:var(--ink)}
+      .ct-node[aria-pressed=true] .ct-lbl{color:var(--acct)}
+      .ct-sub{font-size:12px;color:var(--t3);white-space:nowrap}
+      .ct-panel{display:flex;flex-direction:column;gap:16px;margin-top:18px;padding-top:22px;border-top:1px solid var(--line)}
+      .ct-panel:not([hidden]){animation:sIn .5s cubic-bezier(.16,1,.3,1)}
+      .ct-head{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:baseline;gap:6px 12px}
+      .ct-title{font-size:20px;font-weight:800;letter-spacing:-.02em}
+      .ct-meta{font-size:13px;font-weight:600;color:var(--t3)}
+      .bubbles{display:flex;flex-wrap:wrap;gap:10px}
+      .bub{display:inline-flex;align-items:center;gap:10px;min-height:44px;padding:6px 14px 6px 6px;border-radius:999px;border:1px solid var(--line2);background:var(--surf);color:var(--ink);font-size:14.5px;font-weight:500;line-height:1.3;text-decoration:none;transition:border-color .2s ease,background .2s ease,transform .25s cubic-bezier(.34,1.56,.5,1)}
+      a.bub:hover{border-color:var(--c);background:color-mix(in srgb,var(--c) 8%,var(--surf));color:var(--ink);transform:translateY(-2px)}
+      .bub-code{flex:none;padding:6px 11px;border-radius:999px;background:color-mix(in srgb,var(--c) 14%,transparent);color:var(--c);font-size:12.5px;font-weight:700;white-space:nowrap;font-variant-numeric:tabular-nums}
+      .bub-arr{font-size:12px;color:var(--t3)}
+
+      /* skills: 2×2 cards; a picked card flies into the centred dialog */
+      .sk-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+      .sk-card{display:flex;align-items:center;gap:22px;width:100%;min-height:176px;padding:28px;color:var(--ink);text-align:left;cursor:pointer;transition:transform .35s cubic-bezier(.2,.7,.2,1),box-shadow .35s ease,border-color .35s ease}
+      .sk-card:hover{transform:translateY(-4px);box-shadow:var(--shadowH);border-color:rgba(255,106,61,.35)}
+      .sk-card.lifted{visibility:hidden}
+      .sk-ic{flex:none;display:flex;align-items:center;justify-content:center;width:72px;height:72px;border-radius:20px;background:var(--tint);color:var(--acct)}
+      .sk-ic svg{width:36px;height:36px}
+      .sk-ic.sm{width:56px;height:56px;border-radius:16px}
+      .sk-ic.sm svg{width:28px;height:28px}
+      .sk-txt{flex:1;min-width:0;display:flex;flex-direction:column;gap:8px}
+      .sk-name{font-size:24px;font-weight:800;letter-spacing:-.025em;line-height:1.15}
+      .sk-line{font-size:15px;line-height:1.5;color:var(--t2)}
+      .sk-go{flex:none;font-size:14px;font-weight:600;color:var(--acct)}
+      .skd{width:min(760px,calc(100vw - 32px));max-width:none;max-height:calc(100dvh - 48px);margin:auto;padding:0;border:1px solid rgba(232,80,31,.4);border-radius:30px;background:var(--surf);color:var(--ink);box-shadow:var(--shadowL);overflow:auto;overscroll-behavior:contain}
+      .skd::backdrop{background:rgba(245,245,247,.62);-webkit-backdrop-filter:blur(16px) saturate(1.3);backdrop-filter:blur(16px) saturate(1.3)}
+      [data-ol-theme=dark] .skd::backdrop{background:rgba(10,10,11,.62)}
+      .skd[open]::backdrop{animation:lbIn .3s ease}
+      .skd.closing::backdrop{animation:lbIn .4s ease reverse both}
+      .skd-in{padding:30px 32px 32px}
+      .skd-head{display:flex;align-items:center;gap:16px}
+      .skd-title{flex:1;min-width:0;margin:0;font-size:30px;font-weight:800;letter-spacing:-.035em}
+      .skd-x{flex:none;display:flex;align-items:center;justify-content:center;width:44px;height:44px;padding:0;border-radius:50%;border:1px solid var(--line2);background:var(--surf);color:var(--t2);cursor:pointer;transition:background .2s ease,color .2s ease}
+      .skd-x:hover{background:var(--acc);color:var(--onacc)}
+      .skd-tools{display:flex;flex-wrap:wrap;gap:8px;margin-top:22px}
+      .skd-tool{min-height:42px;padding:0 16px;border-radius:999px;border:1px solid var(--line2);background:var(--chipbg);color:var(--t5);font-size:14px;font-weight:600;cursor:pointer;transition:border-color .2s ease,background .2s ease,color .2s ease}
+      .skd-tool:hover{border-color:var(--line3)}
+      .skd-tool[aria-pressed=true]{border-color:var(--accg);background:var(--tint);color:var(--acct2)}
+      .skd-detail{display:flex;flex-direction:column;gap:12px;margin-top:20px;padding-top:20px;border-top:1px solid var(--line)}
+      .skd-detail:not([hidden]){animation:sIn .45s cubic-bezier(.16,1,.3,1)}
+      .skd-detail h4{margin:0;font-size:22px;font-weight:800;letter-spacing:-.025em}
+      .skd-detail p{margin:0;font-size:15.5px;line-height:1.6;color:var(--t2)}
+      .skd-detail p.skd-kick{margin-top:6px;font-size:12px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--t3)}
+      .skd-row{display:flex;align-items:center;gap:16px;padding:13px 0;border-top:1px solid var(--line);color:var(--ink);text-decoration:none}
+      .skd-row:hover{color:var(--ink)}
+      .skd-row:hover .skd-where{color:var(--acct)}
+      .skd-logo{flex:none;display:flex;align-items:center;justify-content:center;width:72px;height:36px;padding:5px 8px;border-radius:10px;background:#fff;border:1px solid var(--line)}
+      .skd-logo img{max-width:100%;max-height:100%;width:auto;object-fit:contain}
+      .skd-tag{flex:none;width:72px;padding:5px 0;border-radius:999px;font-size:12px;font-weight:700;text-align:center}
+      .skd-tag.t-Job{background:var(--tint);color:var(--acct2)}
+      .skd-tag.t-Project{background:var(--surf2);color:var(--t5)}
+      .skd-tag.t-Course{background:color-mix(in srgb,var(--g-math) 14%,transparent);color:var(--g-math)}
+      .skd-rt{flex:1;min-width:0;display:flex;flex-direction:column;gap:3px}
+      .skd-where{font-size:15px;font-weight:700;transition:color .2s ease}
+      .skd-what{font-size:14px;line-height:1.45;color:var(--t2)}
+      .skd-arr{flex:none;font-size:18px;color:var(--acct)}
+      @media (max-width:760px){
+        .sk-grid{grid-template-columns:minmax(0,1fr)}
+        .sk-card{min-height:0;padding:22px;gap:18px}
+        .sk-ic{width:60px;height:60px;border-radius:18px}
+        .sk-ic svg{width:30px;height:30px}
+        .sk-name{font-size:21px}
+        .sk-go{display:none}
+        .edu-logo{height:84px;min-width:84px}
+        .es:first-child{padding-left:0}
+        .skd-in{padding:24px 20px}
+        .skd-title{font-size:24px}
+      }
       .grid-2{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(380px,100%),1fr));gap:16px}
       .grid-3{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(260px,100%),1fr));gap:16px}
       .org{overflow:hidden;transition:transform .35s cubic-bezier(.2,.7,.2,1),box-shadow .35s ease,border-color .35s ease}
@@ -655,7 +769,7 @@ const CODE_ROWS = [
       /* ================= EXPERIENCE ================= */
       .xp{display:flex;flex-wrap:wrap;align-items:flex-start;gap:28px}
       /* timeline: [year / months] [rail + dot] [card] */
-      .tl{position:relative;flex:1 1 400px;max-width:470px;padding:6px 0}
+      .tl{position:sticky;top:104px;flex:1 1 400px;max-width:470px;padding:6px 0}
       .tl-spine{position:absolute;left:89px;top:6px;bottom:6px;width:2px;border-radius:2px;background:var(--line2);transform-origin:center top;animation:tSpine 1.2s cubic-bezier(.65,0,.35,1) .2s backwards}
       .tl-fill{position:absolute;left:89px;top:6px;width:2px;border-radius:2px;background:linear-gradient(180deg,#ff6a3d,rgba(255,106,61,.55));box-shadow:var(--fillglow);transition:height .6s cubic-bezier(.32,1.1,.36,1)}
       .tl-list{display:flex;flex-direction:column;gap:8px}
@@ -702,8 +816,8 @@ const CODE_ROWS = [
       .car-dot[aria-current=true] i{width:22px;background:var(--acc)}
       .car.single .car-btn,.car.single .car-dots,.car.single .car-count{display:none}
       /* whole photo over a blurred copy of itself, so portrait shots aren't cropped */
-      .slide .slide-bg{object-fit:cover;filter:blur(30px) saturate(1.3);transform:scale(1.2);opacity:.6}
-      .slide .slide-img{object-fit:contain}
+      .slide .slide-bg,.xg-main .slide-bg{object-fit:cover;filter:blur(30px) saturate(1.3);transform:scale(1.2);opacity:.6}
+      .slide .slide-img,.xg-main .slide-img{object-fit:contain}
       .car-btn,.car-count,.car-dots{z-index:3}
       /* job with no photos: the logo on a quiet branded panel */
       .slide.brand{flex-direction:column;gap:18px;background:var(--ph);cursor:default}
@@ -715,17 +829,31 @@ const CODE_ROWS = [
       .s-head .s-title{margin:0}
       .s-head .s-role{margin:8px 0 0}
 
-      .stage-body{padding:clamp(24px,3vw,38px)}
+      .stage-head{padding:clamp(24px,3vw,36px) clamp(24px,3vw,38px) 0}
+      .stage-body{padding:clamp(20px,2.4vw,30px) clamp(24px,3vw,38px) clamp(24px,3vw,38px)}
+      .stage-body .s-sum{margin-top:0}
+      /* job photos: big one on the left, up to four on the right; click one to swap it in */
+      .xg{display:grid;grid-template-columns:minmax(0,1fr) clamp(96px,19%,160px);gap:10px;margin:24px clamp(24px,3vw,38px) 0}
+      .xg.solo{grid-template-columns:minmax(0,1fr)}
+      .xg-main{position:relative;aspect-ratio:16/10;border-radius:18px;border:1px solid var(--line);overflow:hidden;background:var(--ph)}
+      .xg-main img{transition:opacity .35s ease}
+      .xg-main.swap .slide-img{animation:xgIn .5s cubic-bezier(.16,1,.3,1)}
+      .xg-thumbs{display:grid;grid-template-rows:repeat(4,minmax(0,1fr));gap:10px;min-height:0}
+      .xg-th{position:relative;display:block;width:100%;height:100%;min-height:0;padding:0;border:1px solid var(--line);border-radius:12px;background:var(--ph);overflow:hidden;cursor:pointer;transition:transform .3s cubic-bezier(.34,1.56,.5,1),border-color .25s ease,box-shadow .25s ease}
+      .xg-th img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transition:transform .5s cubic-bezier(.2,.7,.2,1),filter .3s ease}
+      .xg-th:hover{transform:translateY(-2px);border-color:rgba(232,80,31,.5);box-shadow:var(--shadow)}
+      .xg-th:hover img{transform:scale(1.06)}
+      .xg-th.pop{animation:gPop .45s cubic-bezier(.34,1.4,.5,1)}
       .s-top{display:flex;flex-wrap:wrap;align-items:center;gap:12px}
-      .s-kick{font-size:12px;letter-spacing:.08em;color:var(--acct)}
-      .badge-now{display:inline-flex;align-items:center;gap:6px;padding:3px 10px;border-radius:999px;border:1px solid var(--greenln);background:var(--greenbg);color:var(--green);font-size:11px;letter-spacing:.06em}
+      .s-kick{font-size:12px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--acct)}
+      .badge-now{display:inline-flex;align-items:center;gap:6px;padding:3px 10px;border-radius:999px;border:1px solid var(--greenln);background:var(--greenbg);color:var(--green);font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase}
       .badge-now i{width:6px;height:6px;border-radius:50%;background:var(--greendot);animation:mPulse 2.2s ease-in-out infinite}
       .s-title{margin:14px 0 0;font-size:clamp(30px,3.4vw,44px);font-weight:800;letter-spacing:-.04em;line-height:1.03}
       .s-role{margin:12px 0 4px;font-size:18px;font-weight:500;color:var(--acct)}
       /* job details shown once a job is opened */
       .s-facts{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px 24px;margin:20px 0 0;padding:16px 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
       .s-facts div{display:flex;flex-direction:column;gap:4px;min-width:0}
-      .s-facts dt{font-size:11px;letter-spacing:.1em;color:var(--t3)}
+      .s-facts dt{font-size:11px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--t3)}
       .s-facts dd{margin:0;font-size:15.5px;font-weight:600;letter-spacing:-.01em;color:var(--ink)}
       .s-sum{margin:20px 0 0;max-width:64ch;font-size:16.5px;line-height:1.6;color:var(--t2);text-wrap:pretty}
       .tools{display:flex;flex-wrap:wrap;gap:8px;margin-top:20px}
@@ -849,7 +977,8 @@ const CODE_ROWS = [
 
       /* hobbies */
       .hobbies{margin-top:72px;padding-top:40px;border-top:1px solid var(--line)}
-      .hob-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(168px,42%),1fr));gap:26px 18px}
+      .hob-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(200px,42%),1fr));gap:26px 22px}
+      .hob-stack{aspect-ratio:1/1}
       .hob{position:relative;display:flex;flex-direction:column;gap:6px;min-width:0}
       .hob:hover{z-index:2}
       .hob-stack{position:relative;display:block;width:100%;aspect-ratio:4/5;margin-bottom:8px;padding:0;border:0;background:none;cursor:zoom-in}
@@ -924,7 +1053,7 @@ const CODE_ROWS = [
       .soc-audit{--brand:#13294b;--on:#fff}
       .soc-tel{--brand:#22a55a;--on:#fff}
       /* label bubble above each button */
-      .soc::after{content:attr(data-tip);position:absolute;bottom:calc(100% + 10px);left:50%;padding:6px 10px;border-radius:8px;background:var(--ink);color:var(--bg);font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:11.5px;white-space:nowrap;pointer-events:none;opacity:0;transform:translate(-50%,4px);transition:opacity .2s ease,transform .2s ease}
+      .soc::after{content:attr(data-tip);position:absolute;bottom:calc(100% + 10px);left:50%;padding:6px 10px;border-radius:8px;background:var(--ink);color:var(--bg);font-size:11.5px;white-space:nowrap;pointer-events:none;opacity:0;transform:translate(-50%,4px);transition:opacity .2s ease,transform .2s ease}
       .soc:hover::after,.soc:focus-visible::after{opacity:1;transform:translate(-50%,0)}
       .foot-meta{margin:0;font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--t3)}
       /* LinkedIn buttons turn LinkedIn blue on hover */
@@ -933,7 +1062,7 @@ const CODE_ROWS = [
       /* ================= RESPONSIVE ================= */
       @media (max-width:980px){
         /* timeline becomes a swipeable row above the stage */
-        .tl{flex:1 1 100%;min-width:0;max-width:none;padding:0}
+        .tl{position:relative;top:auto;flex:1 1 100%;min-width:0;max-width:none;padding:0}
         .tl-spine,.tl-fill,.t-when{display:none}
         .t-mwhen{display:block}
         .tl-list{flex-direction:row;gap:10px;margin:0 -24px;padding:4px 24px 10px;overflow-x:auto;scroll-snap-type:x proximity;scroll-padding:0 24px;scrollbar-width:none}
@@ -945,6 +1074,8 @@ const CODE_ROWS = [
       }
       @media (max-width:900px){
         .about-in{padding:80px 24px}
+        .about-grid{grid-template-columns:minmax(0,1fr);gap:36px}
+        .about-photo{max-width:420px;aspect-ratio:1/1}
       }
       @media (max-width:640px){
         .page{padding:124px 24px 72px}
@@ -954,10 +1085,8 @@ const CODE_ROWS = [
         .h3{font-size:22px}
         .h-cta{margin-top:36px}
         .btn{height:46px;padding:0 20px}
-        .school,.gpa,.pd-sum{padding:26px 24px}
-        .gpa-num{font-size:64px}
-        .school,.gpa{padding:24px 22px}
-        .crs{grid-template-columns:76px minmax(0,1fr) auto;gap:10px}
+        .pd-sum{padding:26px 24px}
+        .edu-banner,.ct{padding:22px 20px}
         .tiles{flex-wrap:nowrap;gap:10px;margin:0 -24px 24px;padding:6px 24px 14px;overflow-x:auto;scroll-snap-type:x proximity;scroll-padding:0 24px;scrollbar-width:none}
         .tiles::-webkit-scrollbar{display:none}
         .tile,.tile-all{flex:0 0 156px;min-width:0;scroll-snap-align:start}
@@ -966,6 +1095,9 @@ const CODE_ROWS = [
         .feat-img{min-height:220px}
         .pd-main{min-height:240px}
         .stage{border-radius:24px}
+        .xg{grid-template-columns:minmax(0,1fr)}
+        .xg-thumbs{grid-template-rows:none;grid-template-columns:repeat(4,minmax(0,1fr))}
+        .xg-th{aspect-ratio:1}
         .s-head{flex-direction:column;align-items:flex-start;gap:14px}
         .logo-tile{height:54px;min-width:54px;padding:8px 12px;border-radius:14px}
         .foot{padding:40px 24px 32px}
@@ -979,6 +1111,7 @@ const CODE_ROWS = [
       @keyframes themeReveal{from{clip-path:circle(0px at var(--tx,50%) var(--ty,50px))}to{clip-path:circle(170vmax at var(--tx,50%) var(--ty,50px))}}
       @keyframes screenIn{from{opacity:0;transform:translateY(20px) scale(.992);filter:blur(10px)}to{opacity:1;transform:none;filter:blur(0)}}
       @keyframes screenOut{from{opacity:1;transform:none;filter:blur(0)}to{opacity:0;transform:translateY(-14px) scale(.994);filter:blur(9px)}}
+      @keyframes xgIn{from{opacity:0;transform:scale(1.03)}to{opacity:1;transform:none}}
       @keyframes cueBob{0%,100%{transform:translateY(0)}50%{transform:translateY(5px)}}
       @keyframes nvIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
       @keyframes thIcon{from{opacity:0;transform:rotate(-120deg) scale(.4)}to{opacity:1;transform:none}}
@@ -1000,7 +1133,6 @@ const CODE_ROWS = [
       @keyframes sSlide{from{opacity:0;transform:translateX(60px);filter:blur(6px)}to{opacity:1;transform:none;filter:blur(0)}}
       @keyframes gPop{from{opacity:0;transform:scale(.93) translateY(16px);filter:blur(8px)}to{opacity:1;transform:none;filter:blur(0)}}
       @keyframes sIn{from{opacity:0;transform:translateY(14px);filter:blur(10px)}to{opacity:1;transform:none;filter:blur(0)}}
-      @keyframes eMeter{from{transform:scaleX(0)}to{transform:scaleX(1)}}
       @keyframes mPulse{0%,100%{opacity:.5}50%{opacity:1}}
       @keyframes tSpine{from{transform:scaleY(0)}to{transform:scaleY(1)}}
       @keyframes icSpin{to{transform:rotate(360deg)}}
@@ -1071,6 +1203,12 @@ const CODE_ROWS = [
         <section class="about" id="about" aria-labelledby="about-h">
           <div class="about-in">
             <div class="about-grid">
+              <figure class="about-me rv">
+                <div class="about-photo ph" data-zoom={ABOUT.photo.src} data-cap={ABOUT.photo.caption} tabindex="0" role="button" aria-label="View photo full screen">
+                  <img src={ABOUT.photo.src} alt={ABOUT.photo.caption} loading="lazy" decoding="async" onerror="this.remove()" />
+                  <span class="zoom-hint" aria-hidden="true"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"></path></svg></span>
+                </div>
+              </figure>
               <div class="about-txt">
                 <p class="kick rv">About me</p>
                 <h2 class="about-title rv" id="about-h" style="--d:.06s">{ABOUT.title}</h2>
@@ -1125,71 +1263,66 @@ const CODE_ROWS = [
             <h2 class="sec-title" id="edu-h">Education</h2>
           </header>
 
-          <div class="edu-top">
-            <div class="card school fx-rise" style="--d:.1s">
-              <div class="school-top">
-                <span class="logo-tile school-logo"><img src="/logos/uiuc.png" alt="University of Illinois logo" decoding="async" /></span>
-                <p class="kick">Grainger College of Engineering</p>
-              </div>
-              <h3 class="school-name">University of Illinois Urbana-Champaign</h3>
-              <p class="degree">B.S. Mechanical Engineering <span class="acc">·</span> Minor in Computer Science</p>
-              <div class="pills">
-                <span class="pill pill-acc">Dean’s List ×4</span>
-                <span class="pill">Expected May 2028</span>
-              </div>
+          <div class="card edu-banner fx-rise" style="--d:.1s">
+            <span class="logo-tile edu-logo"><img src="/logos/uiuc.png" alt="University of Illinois logo" decoding="async" /></span>
+            <div class="edu-id">
+              <h3 class="edu-name">University of Illinois Urbana-Champaign</h3>
+              <p class="edu-deg">B.S. Mechanical Engineering <span class="acc">·</span> Minor in Computer Science</p>
             </div>
-            <div class="card gpa fx-rise" style="--d:.16s">
-              <span class="kick">Cumulative GPA</span>
-              <div>
-                <div class="gpa-row"><span class="gpa-num">{GPA.toFixed(2)}</span><span class="gpa-of">/ 4.00</span></div>
-                <div class="meter" aria-hidden="true"><i style={`width:${GPA_PCT}%`}></i></div>
+            <dl class="edu-stats">
+              <div class="es"><dt class="es-lbl">GPA / 4.00</dt><dd class="es-num es-acc">{GPA.toFixed(2)}</dd></div>
+              <div class="es"><dt class="es-lbl">Expected May</dt><dd class="es-num">2028</dd></div>
+            </dl>
+          </div>
+
+          <div class="block fx-rise" style="--d:.18s">
+            <div class="block-head">
+              <h3 class="h3">Coursework</h3>
+              <a class="btn btn-ghost btn-sm audit-btn" href={AUDIT.url} target="_blank" rel="noopener noreferrer"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"></path><path d="M14 3v6h6M8.5 14.5l2.2 2.2 4.8-4.8"></path></svg> Full degree audit <span aria-hidden="true">↗</span></a>
+            </div>
+            <div class="card ct">
+              <div class="ct-scroll" id="ctScroll">
+                <div class="ct-line" role="group" aria-label="Semesters">
+                  <span class="ct-rail" aria-hidden="true"></span>
+                  {TIMELINE.map((t, i) => (
+                    <button class:list={['ct-node', { 'is-now': t.status === 'now' }]} type="button" data-term={i} aria-pressed={i === TL_START ? 'true' : 'false'} aria-controls={`ct-p-${i}`}>
+                      <span class="ct-dot" aria-hidden="true"></span>
+                      <span class="ct-lbl">{tlLabel(t)}</span>
+                      <span class="ct-sub">{fmtHrs(termHrs(t))} hrs{t.status === 'now' ? ' · now' : ''}</span>
+                    </button>
+                  ))}
+                </div>
               </div>
+              {TIMELINE.map((t, i) => (
+                <div class="ct-panel" id={`ct-p-${i}`} data-term-panel={i} hidden={i !== TL_START}>
+                  <div class="ct-head">
+                    <span class="ct-title">{t.term}</span>
+                    <span class="ct-meta">{termNote(t)} · {t.courses.length} classes · {fmtHrs(termHrs(t))} hrs</span>
+                  </div>
+                  <div class="bubbles">
+                    {t.courses.map((c) => c.href ? (
+                      <a class={`bub g-${c.grp}`} href={c.href} target="_blank" rel="noopener noreferrer"><span class="bub-code">{c.code}</span>{c.name}<span class="bub-arr" aria-hidden="true">↗</span></a>
+                    ) : (
+                      <span class={`bub g-${c.grp}`}><span class="bub-code">{c.code}</span>{c.name}</span>
+                    ))}
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
 
-          <div class="block fx-rise" style="--d:.28s">
-            <div class="block-head cw-head">
-              <div>
-                <h3 class="h3">Coursework</h3>
-                <p class="cw-sub">Every course on my degree audit, newest first. Tap a color to filter.</p>
-              </div>
-              <a class="btn btn-ghost btn-sm audit-btn" href={AUDIT.url} target="_blank" rel="noopener noreferrer"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"></path><path d="M14 3v6h6M8.5 14.5l2.2 2.2 4.8-4.8"></path></svg> Full degree audit <span aria-hidden="true">↗</span></a>
-            </div>
-
-            <div class="cw-legend" id="cwLegend" role="group" aria-label="Filter courses by area">
-              {GROUPS.map((g) => (
-                <button class={`lg g-${g.key}`} type="button" data-grp={g.key} aria-pressed="false">
-                  <i aria-hidden="true"></i>{g.label}<span class="lg-n">{fmtHrs(GROUP_HRS[g.key])} hrs</span>
+          <div class="block fx-rise" style="--d:.26s">
+            <h3 class="h3 block-title">Skills</h3>
+            <div class="sk-grid">
+              {SKILLS.map((sk) => (
+                <button class="card sk-card" type="button" data-sk={sk.key} aria-haspopup="dialog" aria-controls="skd">
+                  <span class="sk-ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" set:html={sk.icon}></svg></span>
+                  <span class="sk-txt">
+                    <span class="sk-name">{sk.name}</span>
+                    <span class="sk-line">{sk.tools.map((t) => t.name).join(' · ')}</span>
+                  </span>
+                  <span class="sk-go" aria-hidden="true">Explore ›</span>
                 </button>
-              ))}
-            </div>
-
-            <div class="tgrid" id="tgrid">
-              {TERMS.map((t, ti) => (
-                <section class:list={['tcard', t.status && `is-${t.status}`]} aria-label={t.term}>
-                  <header class="tc-head">
-                    <div class="tc-title">
-                      <h4>{t.term}</h4>
-                      <span class:list={['tc-status', t.status && `st-${t.status}`]}>{t.status === 'now' && <i aria-hidden="true"></i>}{termNote(t)}</span>
-                    </div>
-                    {t.status !== 'planned' && <span class="tc-hrs">{fmtHrs(termHrs(t))} hrs</span>}
-                  </header>
-                  <ul class="crs-list">
-                    {t.courses.map((c) => (
-                      <li data-grp={c.grp}>
-                        {c.href ? (
-                          <a class:list={['crs', `g-${c.grp}`]} href={c.href} target="_blank" rel="noopener noreferrer">
-                            <span class="crs-code">{c.code}</span><span class="crs-name">{c.name}</span>{c.hrs !== undefined && t.status !== 'planned' && <span class="crs-hrs">{fmtHrs(c.hrs)}</span>}
-                          </a>
-                        ) : (
-                          <span class:list={['crs', `g-${c.grp}`, { 'crs-req': c.req }]}>
-                            <span class="crs-code">{c.code || '—'}</span><span class="crs-name">{c.name}</span>{c.hrs !== undefined && <span class="crs-hrs">{fmtHrs(c.hrs)}</span>}
-                          </span>
-                        )}
-                      </li>
-                    ))}
-                  </ul>
-                </section>
               ))}
             </div>
           </div>
@@ -1263,59 +1396,53 @@ const CODE_ROWS = [
             <div class="stage-wrap">
               {EXP.map((e, i) => (
                 <article class="stage" id={`xp-panel-${i}`} data-panel={i} hidden={i !== 0} aria-label={`${e.title}, ${e.role}`}>
-                  <div class="car s-in" data-car data-zoom-group aria-roledescription="carousel" aria-label={`Photos from ${e.title}`}>
-                    <div class="car-track">
-                      {e.photos.length ? e.photos.map((ph, k) => (
-                        <div class="slide ph" role="group" aria-roledescription="slide" aria-label={`${k + 1} of ${e.photos.length}`} data-zoom={ph.src} data-cap={ph.alt}>
-                          <span aria-hidden="true">Photo {k + 1} — {e.title}</span>
-                          <img class="slide-bg" src={sm(ph.src)} alt="" aria-hidden="true" loading="lazy" decoding="async" onerror="this.remove()" />
-                          <img class="slide-img" src={ph.src} alt={ph.alt || `${e.title}, photo ${k + 1}`} loading="lazy" decoding="async" onerror="this.parentNode.querySelectorAll('img').forEach(function(i){i.remove()})" />
-                          <span class="zoom-hint" aria-hidden="true"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"></path></svg></span>
-                        </div>
-                      )) : (
-                        <div class="slide ph brand" role="group" aria-roledescription="slide" aria-label={e.title}>
-                          {e.logo && <span class="logo-tile big"><img src={e.logo} alt={`${e.title} logo`} loading="lazy" decoding="async" /></span>}
-                          <span class="brand-cap mono">{`${e.dates} · ${e.where}`.toUpperCase()}</span>
-                        </div>
-                      )}
+                  <div class="stage-head">
+                    <div class="s-top s-in" style="--d:.03s">
+                      <span class="s-kick">Experience · {pad2(i + 1)} / {pad2(EXP.length)}</span>
+                      {e.current && <span class="badge-now"><i aria-hidden="true"></i>Current</span>}
                     </div>
-                    <button class="car-btn car-prev" type="button" aria-label="Previous photo">
-                      <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"></path></svg>
-                    </button>
-                    <button class="car-btn car-next" type="button" aria-label="Next photo">
-                      <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"></path></svg>
-                    </button>
-                    <span class="car-count mono" aria-hidden="true">1 / {Math.max(1, e.photos.length)}</span>
-                    <div class="car-dots">
-                      {e.photos.map((_, k) => (
-                        <button class="car-dot" type="button" aria-label={`Show photo ${k + 1}`} aria-current={k === 0 ? 'true' : 'false'}><i></i></button>
-                      ))}
-                    </div>
-                  </div>
-
-                  <div class="stage-body">
-                    <div class="s-top s-in" style="--d:.05s">
-                      <span class="s-kick mono">EXPERIENCE · {pad2(i + 1)} / {pad2(EXP.length)}</span>
-                      {e.current && <span class="badge-now mono"><i aria-hidden="true"></i>CURRENT</span>}
-                    </div>
-                    <div class="s-head s-in" style="--d:.08s">
-                      {e.logo && e.photos.length > 0 && <span class="logo-tile"><img src={e.logo} alt={`${e.title} logo`} loading="lazy" decoding="async" onerror="this.parentNode.remove()" /></span>}
+                    <div class="s-head s-in" style="--d:.06s">
+                      {e.logo && <span class="logo-tile"><img src={e.logo} alt={`${e.title} logo`} loading="lazy" decoding="async" onerror="this.parentNode.remove()" /></span>}
                       <div>
                         <h3 class="s-title">{e.title}</h3>
                         <p class="s-role">{e.role}</p>
                       </div>
                     </div>
-                    <dl class="s-facts s-in" style="--d:.13s">
-                      <div><dt class="mono">WHEN</dt><dd>{e.dates}</dd></div>
-                      <div><dt class="mono">LENGTH</dt><dd>{e.length}</dd></div>
-                      <div><dt class="mono">WHERE</dt><dd>{e.where}</dd></div>
+                    <dl class="s-facts s-in" style="--d:.1s">
+                      <div><dt>When</dt><dd>{e.dates}</dd></div>
+                      <div><dt>Length</dt><dd>{e.length}</dd></div>
+                      <div><dt>Where</dt><dd>{e.where}</dd></div>
                     </dl>
-                    <p class="s-sum s-in" style="--d:.16s">{e.summary}</p>
-                    <div class="tools s-in" style="--d:.19s">
+                  </div>
+
+                  {e.photos.length > 0 && (
+                    <div class:list={['xg s-in', { solo: e.photos.length === 1 }]} data-xg data-zoom-group style="--d:.14s">
+                      <div class="xg-main ph" data-zoom={e.photos[0].src} data-cap={e.photos[0].alt} tabindex="0" role="button" aria-label="View this photo full screen">
+                        <span aria-hidden="true">Photo — {e.title}</span>
+                        <img class="slide-bg" src={sm(e.photos[0].src)} alt="" aria-hidden="true" loading="lazy" decoding="async" onerror="this.remove()" />
+                        <img class="slide-img" src={e.photos[0].src} alt={e.photos[0].alt} loading="lazy" decoding="async" onerror="this.parentNode.querySelectorAll('img').forEach(function(i){i.remove()})" />
+                        <span class="zoom-hint" aria-hidden="true"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"></path></svg></span>
+                      </div>
+                      {e.photos.length > 1 && (
+                        <div class="xg-thumbs" role="group" aria-label="More photos">
+                          {e.photos.slice(1, 5).map((ph) => (
+                            <button class="xg-th" type="button" data-swap data-src={ph.src} data-alt={ph.alt} aria-label={`Show photo: ${ph.alt}`}>
+                              <img src={sm(ph.src)} alt="" loading="lazy" decoding="async" onerror={`this.onerror=null;this.src='${ph.src}'`} />
+                            </button>
+                          ))}
+                        </div>
+                      )}
+                      {e.photos.slice(0, 5).map((ph) => <span hidden data-zoom={ph.src} data-cap={ph.alt} data-zoom-ready></span>)}
+                    </div>
+                  )}
+
+                  <div class="stage-body">
+                    <p class="s-sum s-in" style="--d:.18s">{e.summary}</p>
+                    <div class="tools s-in" style="--d:.21s">
                       {e.tools.map((t) => <span class="tool">{t}</span>)}
                     </div>
                     <ul class="bul">
-                      {e.bullets.map((b, k) => <li class="s-in" style={`--d:${(0.22 + k * 0.05).toFixed(2)}s`}>{b}</li>)}
+                      {e.bullets.map((b, k) => <li class="s-in" style={`--d:${(0.24 + k * 0.05).toFixed(2)}s`}>{b}</li>)}
                     </ul>
                   </div>
                 </article>
@@ -1576,6 +1703,44 @@ const CODE_ROWS = [
       </div>
     </footer>
 
+    <!-- ===================== SKILL DETAILS ===================== -->
+    <dialog class="skd" id="skd" aria-labelledby={`skd-h-${SKILLS[0].key}`}>
+      <div class="skd-in">
+        {SKILLS.map((sk) => (
+          <section class="skd-cat" data-sk-panel={sk.key} hidden>
+            <header class="skd-head">
+              <span class="sk-ic sm" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" set:html={sk.icon}></svg></span>
+              <h3 class="skd-title" id={`skd-h-${sk.key}`}>{sk.name}</h3>
+              <button class="skd-x" type="button" data-sk-close aria-label="Close">
+                <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"></path></svg>
+              </button>
+            </header>
+            <div class="skd-tools" role="group" aria-label={`${sk.name} tools`}>
+              {sk.tools.map((t, j) => (
+                <button class="skd-tool" type="button" data-sk-tool={`${sk.key}-${j}`} aria-pressed={j === 0 ? 'true' : 'false'}>{t.name}</button>
+              ))}
+            </div>
+            {sk.tools.map((t, j) => (
+              <div class="skd-detail" data-sk-detail={`${sk.key}-${j}`} hidden={j !== 0}>
+                <h4>{t.name}</h4>
+                <p>{t.blurb}</p>
+                <p class="skd-kick">Where I used it</p>
+                <div class="skd-ev">
+                  {t.ev.map((e) => (
+                    <a class="skd-row" href={e.href} data-goexp={e.exp} {...(e.ext ? { target: '_blank', rel: 'noopener noreferrer' } : {})}>
+                      {e.logo ? <span class="skd-logo"><img src={e.logo} alt="" decoding="async" /></span> : <span class={`skd-tag t-${e.type}`}>{e.type}</span>}
+                      <span class="skd-rt"><span class="skd-where">{e.where}</span><span class="skd-what">{e.what}</span></span>
+                      <span class="skd-arr" aria-hidden="true">{e.ext ? '↗' : '›'}</span>
+                    </a>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </section>
+        ))}
+      </div>
+    </dialog>
+
     <!-- ===================== PHOTO VIEWER ===================== -->
     <dialog class="lb" id="lb" aria-label="Photo viewer">
       <span class="lb-count mono" id="lbCount" aria-live="polite"></span>
@@ -1699,6 +1864,7 @@ const CODE_ROWS = [
           footer.hidden = false;
           window.scrollTo(0, 0);
           if (name === 'experience') updateFill();
+          if (name === 'education') ctToEnd();
           if (name === 'projects') kickTiles();
           switching = false;
         };
@@ -1729,17 +1895,123 @@ const CODE_ROWS = [
         root.classList.add('rv-on');
       }
 
-      /* ---------------- education: coursework filter ---------------- */
-      const cwLegend = $('#cwLegend');
-      const tgrid = $('#tgrid');
-      if (cwLegend && tgrid) {
-        cwLegend.addEventListener('click', (e) => {
-          const b = e.target.closest('[data-grp]');
-          if (!b) return;
-          const g = tgrid.dataset.f === b.dataset.grp ? '' : b.dataset.grp;
-          $$('[data-grp]', cwLegend).forEach((x) => x.setAttribute('aria-pressed', String(x.dataset.grp === g)));
-          $$('li[data-grp]', tgrid).forEach((li) => li.classList.toggle('on', li.dataset.grp === g));
-          if (g) tgrid.dataset.f = g; else delete tgrid.dataset.f;
+      /* ---------------- experience: photo swap ---------------- */
+      const smSrc = (src) => (/\.webp$/.test(src) ? src.replace(/\.webp$/, '-sm.webp') : src);
+      document.addEventListener('click', (e) => {
+        const th = e.target.closest('[data-swap]');
+        if (!th) return;
+        const xg = th.closest('[data-xg]');
+        const main = xg && $('.xg-main', xg);
+        if (!main) return;
+        const big = $('.slide-img', main);
+        const bg = $('.slide-bg', main);
+        const old = { src: main.dataset.zoom, alt: main.dataset.cap || '' };
+        const next = { src: th.dataset.src, alt: th.dataset.alt || '' };
+        // the picked photo goes big, the old big one takes its spot on the right
+        main.dataset.zoom = next.src; main.dataset.cap = next.alt;
+        if (big) { big.src = next.src; big.alt = next.alt; }
+        if (bg) bg.src = smSrc(next.src);
+        th.dataset.src = old.src; th.dataset.alt = old.alt;
+        th.setAttribute('aria-label', 'Show photo: ' + old.alt);
+        const ti = $('img', th);
+        if (ti) { ti.onerror = function () { this.onerror = null; this.src = old.src; }; ti.src = smSrc(old.src); }
+        if (!reduce.matches) {
+          main.classList.remove('swap'); th.classList.remove('pop');
+          void main.offsetWidth;
+          main.classList.add('swap'); th.classList.add('pop');
+        }
+      });
+
+      /* ---------------- education: coursework timeline ---------------- */
+      const ctNodes = $$('[data-term]');
+      const ctPanels = $$('[data-term-panel]');
+      ctNodes.forEach((b) => b.addEventListener('click', () => {
+        ctNodes.forEach((x) => x.setAttribute('aria-pressed', String(x === b)));
+        ctPanels.forEach((p) => { p.hidden = p.dataset.termPanel !== b.dataset.term; });
+      }));
+      // on narrow screens the timeline scrolls; start it at the newest semester
+      function ctToEnd() {
+        const sc = $('#ctScroll');
+        if (sc) sc.scrollLeft = sc.scrollWidth;
+      }
+
+      /* ---------------- education: skills (picked card flies to the centre) ---------------- */
+      const skd = $('#skd');
+      const skIn = skd && $('.skd-in', skd);
+      let skFrom = null;
+      let skBusy = false;
+      // transform that puts the dialog box exactly over rect `a`
+      const flight = (a, b) =>
+        `translate(${a.left + a.width / 2 - (b.left + b.width / 2)}px, ${a.top + a.height / 2 - (b.top + b.height / 2)}px) scale(${a.width / b.width}, ${a.height / b.height})`;
+      function pickTool(panel, id) {
+        $$('[data-sk-tool]', panel).forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.skTool === id)));
+        $$('[data-sk-detail]', panel).forEach((d) => { d.hidden = d.dataset.skDetail !== id; });
+      }
+      function openSkill(card) {
+        if (!skd || !skd.showModal || skd.open || skBusy) return;
+        const key = card.dataset.sk;
+        let panel = null;
+        $$('[data-sk-panel]', skd).forEach((p) => { p.hidden = p.dataset.skPanel !== key; if (!p.hidden) panel = p; });
+        if (!panel) return;
+        const first = $('[data-sk-tool]', panel);
+        if (first) pickTool(panel, first.dataset.skTool);
+        skd.setAttribute('aria-labelledby', 'skd-h-' + key);
+        skFrom = card;
+        skd.classList.remove('closing');
+        root.classList.add('lb-open');
+        skd.showModal();
+        skd.scrollTop = 0;
+        card.classList.add('lifted');
+        const x = $('.skd-x', panel);
+        if (x) x.focus({ preventScroll: true });
+        if (reduce.matches || !skd.animate) return;
+        skd.animate(
+          [{ transform: flight(card.getBoundingClientRect(), skd.getBoundingClientRect()), borderRadius: '28px' }, { transform: 'none', borderRadius: '30px' }],
+          { duration: 560, easing: 'cubic-bezier(.2,.85,.25,1)' }
+        );
+        skIn.animate([{ opacity: 0 }, { opacity: 0, offset: 0.4 }, { opacity: 1 }], { duration: 560, easing: 'ease-out' });
+      }
+      function closeSkill(instant) {
+        if (!skd || !skd.open || skBusy) return;
+        const from = skFrom;
+        const done = () => {
+          skBusy = false;
+          skd.classList.remove('closing');
+          skd.close();
+          root.classList.remove('lb-open');
+          if (from) {
+            from.classList.remove('lifted');
+            if (!instant) from.focus({ preventScroll: true });
+          }
+        };
+        if (instant || reduce.matches || !skd.animate || !from) { done(); return; }
+        skBusy = true;
+        skd.classList.add('closing');
+        const fade = skIn.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 160, fill: 'forwards' });
+        const fly = skd.animate(
+          [{ transform: 'none' }, { transform: flight(from.getBoundingClientRect(), skd.getBoundingClientRect()), borderRadius: '28px' }],
+          { duration: 420, easing: 'cubic-bezier(.4,0,.2,1)', fill: 'forwards' }
+        );
+        fly.onfinish = () => { done(); fade.cancel(); fly.cancel(); };
+      }
+      if (skd) {
+        $$('[data-sk]').forEach((c) => c.addEventListener('click', () => openSkill(c)));
+        skd.addEventListener('cancel', (e) => { e.preventDefault(); closeSkill(); });
+        skd.addEventListener('click', (e) => {
+          if (e.target === skd || e.target.closest('[data-sk-close]')) { closeSkill(); return; }
+          const tb = e.target.closest('[data-sk-tool]');
+          if (tb) { pickTool(tb.closest('[data-sk-panel]'), tb.dataset.skTool); return; }
+          const a = e.target.closest('a');
+          if (!a) return;
+          if (a.dataset.goexp !== undefined) {
+            // a job: jump to Experience with that job open
+            e.preventDefault();
+            closeSkill(true);
+            showView('experience');
+            setTimeout(() => selectExp(Number(a.dataset.goexp)), reduce.matches ? 0 : 300);
+          } else if ((a.getAttribute('href') || '').startsWith('#')) {
+            closeSkill(true); // a project: the hash change opens it
+          }
         });
       }
 
@@ -2046,6 +2318,7 @@ const CODE_ROWS = [
       eager(xpPanels[0]);
       moveInd(true);
       updateFill();
+      if (start.view === 'education') ctToEnd();
       kickTiles();
       if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => { moveInd(true); updateFill(); });
       if ('ResizeObserver' in window) new ResizeObserver(() => moveInd(true)).observe(tabsEl);
