@@ -60,7 +60,7 @@ const GROUPS = [
 const SUBJECT_GROUP = { ME: 'me', TAM: 'me', MATH: 'math', STAT: 'math', CS: 'cs', ECE: 'eng', NPRE: 'eng', ENG: 'eng', PHYS: 'sci', CHEM: 'sci' };
 const course = (code, name, hrs, opts = {}) => {
   const subj = code.split(' ')[0];
-  return { code, name, hrs, grp: opts.grp || SUBJECT_GROUP[subj] || 'gen', href: opts.href === false ? null : COURSE_URL + code.replace(' ', '/') };
+  return { code, name, hrs, grp: opts.grp || SUBJECT_GROUP[subj] || 'gen', href: opts.href === false ? null : opts.href || COURSE_URL + code.replace(' ', '/') };
 };
 
 // From the degree audit (catalog 2024). status: 'now' | 'planned' | 'credit' | '' (completed)
@@ -90,7 +90,7 @@ const TERMS = [
   ] },
   { term: 'Earlier credit', status: 'credit', note: 'Exam & transfer credit', courses: [
     course('MATH 220', 'Calculus', 5), course('MATH 231', 'Calculus II', 3), course('PHYS 211', 'University Physics: Mechanics', 4),
-    course('PHYS 212', 'University Physics: Elec & Mag', 4), course('CS 101', 'Intro Computing: Engrg & Sci', 3), course('SPA 202', 'Spanish, Harper College', 4, { href: false }),
+    course('PHYS 212', 'University Physics: Elec & Mag', 4), course('CS 101', 'Intro Computing: Engrg & Sci', 3), course('SPA 202', 'Spanish, Harper College', 4, { href: 'https://www.harpercollege.edu/catalog/current/courses/spa.php' }),
   ] },
 ];
 // Grades for completed classes, by course code. Leave a code out (or '') and no grade shows.
@@ -558,6 +558,7 @@ const CODE_ROWS = [
         --chipbg:#f5f5f7;--ghostbg:rgba(255,255,255,.6);--pillbg:#fff;--arrowbg:rgba(255,255,255,.88);--dotoff:rgba(0,0,0,.25);
         --code:rgba(0,0,0,.16);--screen:#f5f5f7;--wheel:#fff;--foot:#fff;--track:rgba(0,0,0,.07);--cad1:#fff;--cadbg:#e9e9ed;--lbbg:rgba(245,245,247,.86);
         --g-me:#e2531b;--g-math:#2563eb;--g-cs:#15803d;--g-eng:#7c3aed;--g-sci:#0e7490;--g-gen:#be185d;--ring:#e8501f;
+        --navy:#13294b;--illini:#ff5f05;--navyink:#13294b;--navyline:rgba(19,41,75,.4);
         --tileon:#fff;--tileglow:0 0 0 1px rgba(232,80,31,.15),0 18px 44px rgba(17,17,26,.1),0 0 40px rgba(255,106,61,.12);
         --dotglow:0 0 0 5px rgba(255,106,61,.18);--fillglow:none;--glow:none;
       }
@@ -575,6 +576,7 @@ const CODE_ROWS = [
         --chipbg:rgba(255,255,255,.03);--ghostbg:transparent;--pillbg:rgba(255,255,255,.04);--arrowbg:rgba(10,10,11,.6);--dotoff:rgba(255,255,255,.35);
         --code:rgba(255,255,255,.2);--screen:#0e0e10;--wheel:#141416;--foot:#0c0c0d;--track:rgba(255,255,255,.08);--cad1:#e4e4e8;--cadbg:#bdbdc4;--lbbg:rgba(8,8,9,.88);
         --g-me:#ff8a5c;--g-math:#7aa7ff;--g-cs:#4ade80;--g-eng:#b69aff;--g-sci:#3cc7e3;--g-gen:#f472b6;--ring:#ff6a3d;
+        --navy:#13294b;--illini:#ff5f05;--navyink:#f5f5f7;--navyline:rgba(255,95,5,.45);
         --tileon:#19191c;--tileglow:0 0 0 1px rgba(255,106,61,.15),0 18px 50px rgba(0,0,0,.5),0 0 50px rgba(255,106,61,.1);
         --dotglow:0 0 0 5px rgba(255,106,61,.18),0 0 14px rgba(255,106,61,.7);--fillglow:0 0 10px rgba(255,106,61,.6);--glow:0 0 10px rgba(255,106,61,.7);
       }
@@ -730,35 +732,46 @@ const CODE_ROWS = [
       .audit-btn{gap:8px}
       .audit-btn:hover{border-color:var(--accg);color:var(--acct2)}
 
-      /* degree banner */
-      .edu-banner{display:flex;flex-wrap:wrap;align-items:center;gap:24px;padding:24px 28px}
-      .edu-logo{height:104px;min-width:104px;padding:14px 18px;border-radius:24px;box-shadow:none}
-      .edu-id{flex:999 1 320px;min-width:0;display:flex;flex-direction:column;gap:6px}
-      .edu-name{margin:0;font-size:clamp(24px,2.6vw,30px);font-weight:800;letter-spacing:-.03em;line-height:1.1;text-wrap:balance}
-      .edu-deg{margin:0;font-size:16px;font-weight:500;color:var(--t2)}
-      .edu-stats{flex:1 1 auto;display:flex;flex-wrap:wrap;margin:0}
-      .es{display:flex;flex-direction:column-reverse;gap:4px;padding:4px 22px}
-      .es+.es{border-left:1px solid var(--line)}
-      .es-num{margin:0;font-size:28px;font-weight:800;letter-spacing:-.03em;line-height:1.1;font-variant-numeric:tabular-nums}
-      .es-acc{color:var(--acct)}
-      .es-lbl{font-size:12.5px;color:var(--t3)}
+      /* degree header + coursework in one card: Illini navy band on top, semesters and classes below */
+      .edu-card{padding:0;overflow:hidden}
+      .edu-band{position:relative;overflow:hidden;display:flex;flex-wrap:wrap;align-items:flex-end;gap:24px 36px;padding:38px 210px 36px 40px;background:var(--navy);color:#fff}
+      .edu-bigi{position:absolute;right:56px;top:50%;width:94px;height:auto;margin-top:-67px}
+      .edu-id{position:relative;flex:999 1 340px;min-width:0;display:flex;flex-direction:column;gap:10px}
+      .edu-name{margin:0;font-size:clamp(28px,3.2vw,38px);font-weight:800;letter-spacing:-.035em;line-height:1.04;text-wrap:balance}
+      .edu-deg{margin:0;font-size:16px;font-weight:500;color:#c9d2e0}
+      .edu-deg span{color:var(--illini)}
+      .edu-stats{position:relative;flex:1 1 auto;display:flex;margin:0}
+      .es{display:flex;flex-direction:column-reverse;gap:4px;padding:0 24px}
+      .es:first-child{padding-left:0}
+      .es+.es{border-left:1px solid rgba(255,255,255,.16)}
+      .es-num{margin:0;font-size:40px;font-weight:800;letter-spacing:-.045em;line-height:1;font-variant-numeric:tabular-nums}
+      .es-acc{color:var(--illini)}
+      .es-lbl{font-size:12.5px;color:#c9d2e0}
+      .edu-stripe{height:6px;background:var(--illini)}
+      .edu-body{padding:26px 40px 32px}
+      .edu-body .block-head{align-items:center;margin-bottom:18px}
+      .edu-cw{color:var(--navyink)}
+      .btn.audit-navy{background:var(--navy);border-color:var(--navy);color:#fff}
+      .btn.audit-navy:hover{background:#1c3a66;border-color:#1c3a66;color:#fff}
+      [data-ol-theme=dark] .btn.audit-navy{border-color:rgba(255,255,255,.14)}
 
-      /* coursework timeline: semester dots, then that semester's classes as bubbles */
-      .ct{padding:22px 26px 28px}
-      .ct-scroll{overflow-x:auto;margin:-8px -8px 0;padding:8px 8px 6px;scrollbar-width:none}
+      /* coursework timeline: semester nodes on an orange-filling rail, then that semester's classes as bubbles */
+      .ct-scroll{overflow-x:auto;margin:-8px -8px -12px;padding:8px 8px 18px;scrollbar-width:none}
       .ct-scroll::-webkit-scrollbar{display:none}
       .ct-line{position:relative;display:flex;justify-content:space-between;gap:10px;min-width:780px}
-      .ct-rail{position:absolute;left:24px;right:24px;top:50%;height:2px;margin-top:-1px;border-radius:1px;background:var(--line2)}
+      .ct-rail{position:absolute;left:24px;right:24px;top:50%;height:3px;margin-top:-1.5px;border-radius:2px;background:var(--line2)}
+      .ct-fill{position:absolute;left:0;top:50%;width:0;height:3px;margin-top:-1.5px;border-radius:2px;background:var(--illini);transition:left .55s cubic-bezier(.32,1.1,.36,1),width .55s cubic-bezier(.32,1.1,.36,1)}
       .ct-node{position:relative;flex:0 1 118px;min-width:0;display:flex;flex-direction:column;align-items:center;gap:3px;padding:12px 10px 11px;border-radius:18px;border:1px solid var(--line2);background:var(--surf);color:var(--ink);cursor:pointer;transition:background .25s ease,border-color .25s ease,box-shadow .3s ease,transform .3s cubic-bezier(.34,1.56,.5,1)}
-      .ct-node:hover{transform:translateY(-3px);border-color:rgba(232,80,31,.4);box-shadow:var(--shadow)}
-      .ct-node[aria-pressed=true]{background:linear-gradient(var(--tint),var(--tint)),var(--surf);border-color:var(--accg);box-shadow:0 0 0 1px var(--accg),var(--glow)}
+      .ct-node:hover{transform:translateY(-3px);border-color:var(--navyline);box-shadow:var(--shadow)}
+      .ct-node[aria-pressed=true]{background:var(--navy);border-color:var(--navy);box-shadow:0 10px 24px rgba(19,41,75,.22)}
+      [data-ol-theme=dark] .ct-node[aria-pressed=true]{border-color:rgba(255,95,5,.55);box-shadow:0 10px 24px rgba(0,0,0,.45)}
       .ct-dot{display:none}
       .ct-node.is-now .ct-dot{display:block;position:absolute;top:8px;right:9px;width:7px;height:7px;border-radius:50%;background:var(--greendot);box-shadow:0 0 0 0 var(--greendot);animation:ctLive 2.2s ease-out infinite}
       @keyframes ctLive{0%{box-shadow:0 0 0 0 color-mix(in srgb,var(--greendot) 55%,transparent)}70%,100%{box-shadow:0 0 0 7px transparent}}
       .ct-lbl{font-size:14px;font-weight:700;white-space:nowrap;transition:color .25s ease}
-      .ct-node[aria-pressed=true] .ct-lbl{color:var(--acct)}
+      .ct-node[aria-pressed=true] .ct-lbl{color:#fff}
       .ct-sub{font-size:12px;color:var(--t3);white-space:nowrap}
-      .ct-node[aria-pressed=true] .ct-sub{color:var(--acct2)}
+      .ct-node[aria-pressed=true] .ct-sub{color:#c9d2e0}
       @media (prefers-reduced-motion:reduce){.ct-node.is-now .ct-dot{animation:none}}
       .ct-panel{display:flex;flex-direction:column;gap:16px;margin-top:18px;padding-top:22px;border-top:1px solid var(--line)}
       .ct-panel:not([hidden]){animation:sIn .5s cubic-bezier(.16,1,.3,1)}
@@ -776,13 +789,20 @@ const CODE_ROWS = [
 
       /* skills: 2×2 cards; a picked card flies into the centred dialog */
       @media (max-width:760px){
-        .edu-logo{height:84px;min-width:84px}
-        .es:first-child{padding-left:0}
+        .edu-band{padding:30px 24px 28px}
+        .edu-bigi{width:58px;right:22px;top:28px;margin-top:0}
+        .edu-id{padding-right:64px}
+        .es-num{font-size:32px}
+        .edu-body{padding:22px 20px 26px}
+        .edu-body .block-head{flex-wrap:wrap}
       }
       /* skills: four groups of chips, each with a small looping scene */
       .skl{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
       .skc{padding:20px 22px 22px;transition:transform .35s cubic-bezier(.2,.7,.2,1),box-shadow .35s ease,border-color .35s ease}
       .skc:hover{transform:translateY(-3px);box-shadow:var(--shadowH);border-color:rgba(232,80,31,.3)}
+      /* skills live inside the education card, below coursework */
+      .edu-skills{margin-top:30px;padding-top:26px;border-top:1px solid var(--line)}
+      .edu-skills .skc{border-radius:22px;border:1px solid var(--line2);background:var(--surf)}
       .skc-head{display:flex;align-items:center;gap:14px;margin-bottom:16px}
       .skc-art{flex:none;display:flex;align-items:center;justify-content:center;width:66px;height:54px;border-radius:16px;background:var(--tint);color:var(--acct)}
       .ka{width:50px;height:38px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;overflow:visible}
@@ -1318,7 +1338,6 @@ const CODE_ROWS = [
         .h-cta{margin-top:36px}
         .btn{height:46px;padding:0 20px}
         .pd-sum{padding:26px 24px}
-        .edu-banner,.ct{padding:22px 20px}
         .tiles{flex-wrap:nowrap;gap:10px;margin:0 -24px 24px;padding:6px 24px 14px;overflow-x:auto;scroll-snap-type:x proximity;scroll-padding:0 24px;scrollbar-width:none}
         .tiles::-webkit-scrollbar{display:none}
         .tile,.tile-all{flex:0 0 156px;min-width:0;scroll-snap-align:start}
@@ -1489,27 +1508,33 @@ const CODE_ROWS = [
             <h2 class="sec-title" id="edu-h">Education</h2>
           </header>
 
-          <div class="card edu-banner fx-rise" style="--d:.1s">
-            <span class="logo-tile edu-logo"><img src="/logos/uiuc.png" alt="University of Illinois logo" decoding="async" /></span>
-            <div class="edu-id">
-              <h3 class="edu-name">University of Illinois Urbana-Champaign</h3>
-              <p class="edu-deg">B.S. Mechanical Engineering <span class="acc">·</span> Minor in Computer Science</p>
+          <div class="card edu-card fx-rise" style="--d:.1s">
+            <div class="edu-band">
+              <!-- Illinois Block I (on-dark version: white outline), vector so it stays sharp at any size -->
+              <svg class="edu-bigi" viewBox="0 0 85 121" role="img" aria-label="University of Illinois Block I logo">
+                <path fill="#ffffff" d="M0 0H85V33H70A4 4 0 0 0 66 37V84A4 4 0 0 0 70 88H85V121H0V88H15A4 4 0 0 0 19 84V37A4 4 0 0 0 15 33H0Z"></path>
+                <path fill="#ff5f05" d="M6 5H79V28H66A5 5 0 0 0 61 33V88A5 5 0 0 0 66 93H79V116H6V93H19A5 5 0 0 0 24 88V33A5 5 0 0 0 19 28H6Z"></path>
+              </svg>
+              <div class="edu-id">
+                <h3 class="edu-name">University of Illinois<br />Urbana-Champaign</h3>
+                <p class="edu-deg">B.S. Mechanical Engineering <span>·</span> Minor in Computer Science</p>
+              </div>
+              <dl class="edu-stats">
+                <div class="es"><dt class="es-lbl">GPA / 4.00</dt><dd class="es-num es-acc">{GPA.toFixed(2)}</dd></div>
+                <div class="es"><dt class="es-lbl">Expected May</dt><dd class="es-num">2028</dd></div>
+              </dl>
             </div>
-            <dl class="edu-stats">
-              <div class="es"><dt class="es-lbl">GPA / 4.00</dt><dd class="es-num es-acc">{GPA.toFixed(2)}</dd></div>
-              <div class="es"><dt class="es-lbl">Expected May</dt><dd class="es-num">2028</dd></div>
-            </dl>
-          </div>
+            <div class="edu-stripe" aria-hidden="true"></div>
 
-          <div class="block fx-rise" style="--d:.18s">
+            <div class="edu-body">
             <div class="block-head">
-              <h3 class="h3">Coursework</h3>
-              <a class="btn btn-ghost btn-sm audit-btn" href={AUDIT.url} target="_blank" rel="noopener noreferrer"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"></path><path d="M14 3v6h6M8.5 14.5l2.2 2.2 4.8-4.8"></path></svg> Full degree audit <span aria-hidden="true">↗</span></a>
+              <h3 class="h3 edu-cw">Coursework</h3>
+              <a class="btn btn-sm audit-btn audit-navy" href={AUDIT.url} target="_blank" rel="noopener noreferrer"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"></path><path d="M14 3v6h6M8.5 14.5l2.2 2.2 4.8-4.8"></path></svg> Full degree audit <span aria-hidden="true">↗</span></a>
             </div>
-            <div class="card ct">
               <div class="ct-scroll" id="ctScroll">
                 <div class="ct-line" role="group" aria-label="Semesters">
                   <span class="ct-rail" aria-hidden="true"></span>
+                  <span class="ct-fill" id="ctFill" aria-hidden="true"></span>
                   {TIMELINE.map((t, i) => (
                     <button class:list={['ct-node', { 'is-now': t.status === 'now' }]} type="button" data-term={i} aria-pressed={i === TL_START ? 'true' : 'false'} aria-controls={`ct-p-${i}`}>
                       <span class="ct-dot" aria-hidden="true"></span>
@@ -1537,14 +1562,12 @@ const CODE_ROWS = [
                   </div>
                 </div>
               ))}
-            </div>
-          </div>
 
-          <div class="block fx-rise" style="--d:.26s">
-            <h3 class="h3 block-title">Skills</h3>
+            <div class="edu-skills">
+            <h3 class="h3 edu-cw block-title">Skills</h3>
             <div class="skl">
               {SKILLS.map((sk, i) => (
-                <section class="card skc fx-pop" style={`--d:${(0.3 + i * 0.08).toFixed(2)}s`} aria-labelledby={`skc-${sk.key}`}>
+                <section class="skc fx-pop" style={`--d:${(0.3 + i * 0.08).toFixed(2)}s`} aria-labelledby={`skc-${sk.key}`}>
                   <header class="skc-head">
                     <span class="skc-art" aria-hidden="true"><svg viewBox="0 0 64 48" class={`ka ka-${sk.art}`} set:html={SKILL_ART[sk.art]}></svg></span>
                     <h4 class="skc-name" id={`skc-${sk.key}`}>{sk.name}</h4>
@@ -1564,9 +1587,9 @@ const CODE_ROWS = [
                 </section>
               ))}
             </div>
+            </div>
+            </div>
           </div>
-
-
         </div>
       </section>
 
@@ -2078,15 +2101,29 @@ const CODE_ROWS = [
       /* ---------------- education: coursework timeline ---------------- */
       const ctNodes = $$('[data-term]');
       const ctPanels = $$('[data-term-panel]');
+      const ctFill = $('#ctFill');
+      // the orange rail fills from the first semester to the picked one
+      function ctFillTo() {
+        const b = ctNodes.find((x) => x.getAttribute('aria-pressed') === 'true');
+        if (!ctFill || !b || !b.offsetParent) return;
+        const a = ctNodes[0].offsetLeft + ctNodes[0].offsetWidth / 2;
+        const c = b.offsetLeft + b.offsetWidth / 2;
+        ctFill.style.left = a + 'px';
+        ctFill.style.width = Math.max(0, c - a) + 'px';
+      }
       ctNodes.forEach((b) => b.addEventListener('click', () => {
         ctNodes.forEach((x) => x.setAttribute('aria-pressed', String(x === b)));
         ctPanels.forEach((p) => { p.hidden = p.dataset.termPanel !== b.dataset.term; });
+        ctFillTo();
       }));
       // on narrow screens the timeline scrolls; start it at the newest semester
       function ctToEnd() {
         const sc = $('#ctScroll');
         if (sc) sc.scrollLeft = sc.scrollWidth;
+        ctFillTo();
       }
+      window.addEventListener('resize', ctFillTo);
+      if (document.fonts && document.fonts.ready) document.fonts.ready.then(ctFillTo);
 
       /* ---------------- experience: timeline + photo carousels ---------------- */
       const xpBtns = $$('[data-exp]');
